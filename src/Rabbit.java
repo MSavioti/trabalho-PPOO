@@ -31,7 +31,8 @@ public class Rabbit
     private boolean alive;
     // The rabbit's position
     private Location location;
-
+    
+    private int hp;
     /**
      * Create a new rabbit. A rabbit may be created with age
      * zero (a new born) or with a random age.
@@ -40,6 +41,7 @@ public class Rabbit
      */
     public Rabbit(boolean randomAge)
     {
+        hp = 1;
         age = 0;
         alive = true;
         if(randomAge) {
@@ -55,7 +57,7 @@ public class Rabbit
     {
         incrementAge();
         if(alive) {
-            int births = breed();
+            int births = 0;
             for(int b = 0; b < births; b++) {
                 Rabbit newRabbit = new Rabbit(false);
                 newRabbits.add(newRabbit);
@@ -63,7 +65,17 @@ public class Rabbit
                 newRabbit.setLocation(loc);
                 updatedField.place(newRabbit, loc);
             }
-            Location newLocation = updatedField.freeAdjacentLocation(location);
+            Location newLocation = updatedField.closestFoodLocation(location);
+            if(newLocation != null)
+            {
+                hp++;
+                Food food = (Food)updatedField.getObjectAt(newLocation);
+                if (food != null)
+                    food.setEaten();
+                System.out.println("O hp do coelho x: " + location.getCol() + " y: " + location.getRow() +  " agora é hp" + hp);
+            }
+            else
+                newLocation = updatedField.freeAdjacentLocation(location);
             // Only transfer to the updated field if there was a free location
             if(newLocation != null) {
                 setLocation(newLocation);
@@ -72,6 +84,7 @@ public class Rabbit
             else {
                 // can neither move nor stay - overcrowding - all locations taken
                 alive = false;
+                System.out.println("o coelho da posicao x: " + location.getCol() + " y: " + location.getRow() + " nao pode se mover ou ficar");
             }
         }
     }
@@ -85,6 +98,7 @@ public class Rabbit
         age++;
         if(age > MAX_AGE) {
             alive = false;
+            System.out.println("coelho morrendo por idade");
         }
     }
     
@@ -122,9 +136,18 @@ public class Rabbit
     /**
      * Tell the rabbit that it's dead now :(
      */
-    public void setEaten()
+    public void tryEat()
     {
-        alive = false;
+        if (hp == 1)
+        {
+            alive = false;
+            System.out.println("o coelho da posicao x: " + location.getCol() + " y: " + location.getRow() + " foi comido");
+        }
+        else
+        {
+            hp--;
+            System.out.println("O coelho da posicao x: " + location.getCol() + " y: " + location.getRow() + "levou dano e esta com " + hp + "hp");
+        }
     }
     
     /**

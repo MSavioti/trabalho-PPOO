@@ -15,9 +15,10 @@ import java.util.HashMap;
  */
 public class SimulatorView extends JFrame
 {
+
     // Colors used for empty locations.
     private static final Color EMPTY_COLOR = Color.white;
-
+    
     // Color used for objects that have no defined color.
     private static final Color UNKNOWN_COLOR = Color.gray;
 
@@ -30,7 +31,8 @@ public class SimulatorView extends JFrame
     private HashMap colors;
     // A statistics object computing and storing simulation information
     private FieldStats stats;
-
+    
+    
     /**
      * Create a view of the given width and height.
      */
@@ -130,7 +132,7 @@ public class SimulatorView extends JFrame
      */
     private class FieldView extends JPanel
     {
-        private final int GRID_VIEW_SCALING_FACTOR = 6;
+        private final int GRID_VIEW_SCALING_FACTOR = 30;
 
         private int gridWidth, gridHeight;
         private int xScale, yScale;

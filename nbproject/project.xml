@@ -5,7 +5,7 @@
         <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
             <name>Trabalho</name>
             <source-roots>
-                <root id="src.dir"/>
+                <root id="src.src.dir" name="Pacotes de Códigos-fonte"/>
             </source-roots>
             <test-roots/>
         </data>

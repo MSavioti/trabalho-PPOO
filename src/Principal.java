@@ -1,6 +1,6 @@
 public class Principal{
-    public static void main(String[] args){
+  public static void main(String[] args){
     Simulator simulator = new Simulator();
-    //Teste
-  }
+      System.out.println("Saiu");
+  }       
 }

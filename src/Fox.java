@@ -89,6 +89,7 @@ public class Fox
             else {
                 // can neither move nor stay - overcrowding - all locations taken
                 alive = false;
+                System.out.println("a raposa da posicao x: " + location.getCol() + " y: " + location.getRow() + " morreu por nao poder se mover");
             }
         }
     }
@@ -101,6 +102,7 @@ public class Fox
         age++;
         if(age > MAX_AGE) {
             alive = false;
+            System.out.println("a raposa da posicao x: " + location.getCol() + " y: " + location.getRow() + " morreu pela idade");
         }
     }
     
@@ -112,6 +114,7 @@ public class Fox
         foodLevel--;
         if(foodLevel <= 0) {
             alive = false;
+            System.out.println("a raposa da posicao x: " + location.getCol() + " y: " + location.getRow() + " morreu por fome");
         }
     }
     
@@ -123,15 +126,14 @@ public class Fox
      */
     private Location findFood(Field field, Location location)
     {
-        Iterator adjacentLocations =
-                          field.adjacentLocations(location);
+        Iterator adjacentLocations = field.adjacentLocations(location);
         while(adjacentLocations.hasNext()) {
             Location where = (Location) adjacentLocations.next();
             Object animal = field.getObjectAt(where);
             if(animal instanceof Rabbit) {
                 Rabbit rabbit = (Rabbit) animal;
                 if(rabbit.isAlive()) { 
-                    rabbit.setEaten();
+                    rabbit.tryEat();
                     foodLevel = RABBIT_FOOD_VALUE;
                     return where;
                 }
@@ -151,7 +153,7 @@ public class Fox
         if(canBreed() && rand.nextDouble() <= BREEDING_PROBABILITY) {
             births = rand.nextInt(MAX_LITTER_SIZE) + 1;
         }
-        return births;
+        return 0;
     }
 
     /**

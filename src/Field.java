@@ -146,6 +146,22 @@ public class Field
         }
     }
 
+    public Location closestFoodLocation(Location location)
+    {
+        Iterator adjacent = adjacentLocations(location);
+        while(adjacent.hasNext())
+        {
+            Location next = (Location) adjacent.next();
+//            System.out.println("testando comida em: x" + next.getRow() + " y:" + next.getCol());
+            if(field[next.getRow()][next.getCol()] instanceof Food)
+            {
+                System.out.println("Comida perto, no ponto: x" + next.getRow() + " y:" + next.getCol());
+                return next;
+            }
+        }
+        return null;
+    }
+    
     /**
      * Generate an iterator over a shuffled list of locations adjacent
      * to the given one. The list will not include the location itself.
