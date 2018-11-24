@@ -83,14 +83,14 @@ public class Rabbit
         }
     }*/
 
-    public void hunt(Field currentField, Field updatedField, List newRabbits, List busyLocations)
+    public void hunt(Field currentField, Field updatedField, List newRabbits)
     {
         if(isAlive()) {
             // Move towards the source of food if found.
-            Location newLocation = currentField.closestFoodLocation(location, busyLocations);
+            Location newLocation = currentField.closestFoodLocation(location);
             
             if(newLocation != null) {
-                int births = breed();
+                int births = 0;
                 System.out.println("Terá " + births + " filhos");
                 for(int b = 0; b < births; b++) {
                     Rabbit newRabbit = new Rabbit(false);
@@ -107,7 +107,6 @@ public class Rabbit
                 newLocation = updatedField.freeAdjacentLocation(location);
             // Only transfer to the updated field if there was a free location
             if(newLocation != null) {
-                busyLocations.add(newLocation);
                 setLocation(newLocation);
                 updatedField.place(this, newLocation);
             }

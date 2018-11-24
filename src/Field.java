@@ -158,7 +158,7 @@ public class Field
         }
     }
 
-    public Location closestFoodLocation(Location location, List<Location> busyFields)
+    public Location closestFoodLocation(Location location)
     {
         Iterator adjacent = adjacentLocations(location);
 //        System.out.println("Location: " + location);
@@ -170,16 +170,8 @@ public class Field
             //System.out.print("Testando : x" + next.getRow() + " y:" + next.getCol());
             if(field[next.getRow()][next.getCol()] instanceof Food)
             {
-                boolean estaOcupado = false;
-                for(Location loc : busyFields)
-                {
-                    if(loc.equals(next))
-                    {
-                        estaOcupado = true;
-                    }
-                }
                 //System.out.println("Nome da classe que deveria ser food: " + field[next.getRow()][next.getCol()]);
-                if (!estaOcupado)
+                if (((Food)field[next.getRow()][next.getCol()]).exists())
                     return next;
                 else
                     System.out.println("Você não pode ir para a localizacao " + next + " porque já estão comendo lá");

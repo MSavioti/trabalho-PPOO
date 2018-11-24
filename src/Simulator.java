@@ -149,7 +149,7 @@ public class Simulator extends JFrame implements KeyListener
             if(element instanceof Rabbit) {
                 Rabbit rabbit = (Rabbit)element;
                 if(rabbit.isAlive()) {
-                    rabbit.hunt(field, updatedField, newElements, busyLocations);
+                    rabbit.hunt(field, updatedField, newElements);
                 }
                 else {
                     iter.remove();   // remove dead rabbits from collection

@@ -3,3 +3,4 @@ out/
 *.class
 /Trabalho/nbproject/private/
 /nbproject/private/
+/build/
