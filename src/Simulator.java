@@ -27,7 +27,7 @@ public class Simulator extends JFrame implements KeyListener
     // The default depth of the grid.
     private static final int DEFAULT_DEPTH = 50;
     // The probability that a fox will be created in any given grid position.
-    private static final double FOX_CREATION_PROBABILITY = 0.02;
+    private static final double FOX_CREATION_PROBABILITY = 0.06;
     // The probability that a rabbit will be created in any given grid position.
     private static final double RABBIT_CREATION_PROBABILITY = 0.08;
     
@@ -56,7 +56,7 @@ public class Simulator extends JFrame implements KeyListener
     public Simulator()
     {
         //this(DEFAULT_DEPTH, DEFAULT_WIDTH);
-        this(7,7);
+        this(10,10);
     }
     
     @Override
@@ -142,14 +142,14 @@ public class Simulator extends JFrame implements KeyListener
     {
         step++;
         newElements.clear();
-        
+        List busyLocations = new ArrayList<Field>();
         // let all elements act
         for(Iterator iter = elements.iterator(); iter.hasNext(); ) {
             Object element = iter.next();
             if(element instanceof Rabbit) {
                 Rabbit rabbit = (Rabbit)element;
                 if(rabbit.isAlive()) {
-                    rabbit.hunt(field, updatedField, newElements);
+                    rabbit.hunt(field, updatedField, newElements, busyLocations);
                 }
                 else {
                     iter.remove();   // remove dead rabbits from collection
@@ -214,12 +214,12 @@ public class Simulator extends JFrame implements KeyListener
         field.clear();
         for(int row = 0; row < field.getDepth(); row++) {
             for(int col = 0; col < field.getWidth(); col++) {
-                /*if(rand.nextDouble() <= FOX_CREATION_PROBABILITY) {
+                if(rand.nextDouble() <= FOX_CREATION_PROBABILITY) {
                     Fox fox = new Fox(true);
                     elements.add(fox);
                     fox.setLocation(row, col);
                     field.place(fox, row, col);
-                } else */if(rand.nextDouble() <= RABBIT_CREATION_PROBABILITY) {
+                } else if(rand.nextDouble() <= RABBIT_CREATION_PROBABILITY) {
                     Rabbit rabbit = new Rabbit(true);
                     elements.add(rabbit);
                     rabbit.setLocation(row, col);
