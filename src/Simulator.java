@@ -31,7 +31,7 @@ public class Simulator extends JFrame implements KeyListener
     // The probability that a rabbit will be created in any given grid position.
     private static final double RABBIT_CREATION_PROBABILITY = 0.08;
     
-    private static final double FOOD_CREATION_PROBABILITY = 0.03;
+    private static final double FOOD_CREATION_PROBABILITY = 0.08;
     // The value in seconds that the grid will takes to refresh
     private static final int SECONDS_TO_REFRESH = 10;
     // The Timer object
@@ -56,7 +56,7 @@ public class Simulator extends JFrame implements KeyListener
     public Simulator()
     {
         //this(DEFAULT_DEPTH, DEFAULT_WIDTH);
-        this(10,10);
+        this(7,7);
     }
     
     @Override
@@ -149,7 +149,7 @@ public class Simulator extends JFrame implements KeyListener
             if(element instanceof Rabbit) {
                 Rabbit rabbit = (Rabbit)element;
                 if(rabbit.isAlive()) {
-                    rabbit.run(updatedField, newElements);
+                    rabbit.hunt(field, updatedField, newElements);
                 }
                 else {
                     iter.remove();   // remove dead rabbits from collection
@@ -214,12 +214,12 @@ public class Simulator extends JFrame implements KeyListener
         field.clear();
         for(int row = 0; row < field.getDepth(); row++) {
             for(int col = 0; col < field.getWidth(); col++) {
-                if(rand.nextDouble() <= FOX_CREATION_PROBABILITY) {
+                /*if(rand.nextDouble() <= FOX_CREATION_PROBABILITY) {
                     Fox fox = new Fox(true);
                     elements.add(fox);
                     fox.setLocation(row, col);
                     field.place(fox, row, col);
-                } else if(rand.nextDouble() <= RABBIT_CREATION_PROBABILITY) {
+                } else */if(rand.nextDouble() <= RABBIT_CREATION_PROBABILITY) {
                     Rabbit rabbit = new Rabbit(true);
                     elements.add(rabbit);
                     rabbit.setLocation(row, col);
@@ -230,7 +230,6 @@ public class Simulator extends JFrame implements KeyListener
                     food.setLocation(row, col);
                     field.place(food, row, col);
                 }
-               
                
                 // else leave the location empty.
             }

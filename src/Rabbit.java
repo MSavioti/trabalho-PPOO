@@ -15,7 +15,7 @@ public class Rabbit
     // The age at which a rabbit can start to breed.
     private static final int BREEDING_AGE = 5;
     // The age to which a rabbit can live.
-    private static final int MAX_AGE = 50;
+    private static final int MAX_AGE = 190;
     // The likelihood of a rabbit breeding.
     private static final double BREEDING_PROBABILITY = 0.15;
     // The maximum number of births.
@@ -57,18 +57,9 @@ public class Rabbit
     {
         incrementAge();
         if(alive) {
-            int births = 0;
-            for(int b = 0; b < births; b++) {
-                Rabbit newRabbit = new Rabbit(false);
-                newRabbits.add(newRabbit);
-                Location loc = updatedField.randomAdjacentLocation(location);
-                newRabbit.setLocation(loc);
-                updatedField.place(newRabbit, loc);
-            }
             Location newLocation = updatedField.closestFoodLocation(location);
             if(newLocation != null)
             {
-                hp++;
                 Food food = (Food)updatedField.getObjectAt(newLocation);
                 if (food != null)
                     food.setEaten();
@@ -88,7 +79,37 @@ public class Rabbit
             }
         }
     }
-    
+
+    public void hunt(Field currentField, Field updatedField, List newRabbits)
+    {
+        if(isAlive()) {
+            // Move towards the source of food if found.
+            Location newLocation = currentField.closestFoodLocation(location);
+
+            if(newLocation != null) {
+                int births = breed();
+                for(int b = 0; b < births; b++) {
+                    Rabbit newRabbit = new Rabbit(false);
+                    newRabbits.add(newRabbit);
+                    Location loc = updatedField.randomAdjacentLocation(location);
+                    newRabbit.setLocation(loc);
+                    updatedField.place(newRabbit, loc);
+                }
+                System.out.println("Nome da classe: " + updatedField.getObjectAt(newLocation));
+                Food food = (Food)updatedField.getObjectAt(newLocation);
+                if (food != null)
+                    food.setEaten();
+            }
+            else
+                newLocation = updatedField.freeAdjacentLocation(location);
+            // Only transfer to the updated field if there was a free location
+            if(newLocation != null) {
+                setLocation(newLocation);
+                updatedField.place(this, newLocation);
+            }
+        }
+    }
+
     /**
      * Increase the age.
      * This could result in the rabbit's death.
@@ -110,19 +131,12 @@ public class Rabbit
     private int breed()
     {
         int births = 0;
-        if(canBreed() && rand.nextDouble() <= BREEDING_PROBABILITY) {
+        if(rand.nextDouble() <= BREEDING_PROBABILITY) {
             births = rand.nextInt(MAX_LITTER_SIZE) + 1;
         }
         return births;
     }
 
-    /**
-     * A rabbit can breed if it has reached the breeding age.
-     */
-    private boolean canBreed()
-    {
-        return age >= BREEDING_AGE;
-    }
     
     /**
      * Check whether the rabbit is alive or not.

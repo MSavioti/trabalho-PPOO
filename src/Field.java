@@ -66,8 +66,19 @@ public class Field
     public void place(Object animal, Location location)
     {
         field[location.getRow()][location.getCol()] = animal;
+        System.out.println("Campo : " + location.getRow() + " e " + location.getCol() + " e " + field[location.getRow()][location.getCol()]);
     }
-    
+
+    public void percorrer()
+    {
+        System.out.println("Percorrendo: ");
+        for (int i = 0; i < 7; i++) {
+            for (int j = 0; j < 7; j++) {
+                System.out.print(field[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
     /**
      * Return the animal at the given location, if any.
      * @param location Where in the field.
@@ -149,15 +160,20 @@ public class Field
     public Location closestFoodLocation(Location location)
     {
         Iterator adjacent = adjacentLocations(location);
+        System.out.println("Location: " + location);
         while(adjacent.hasNext())
         {
             Location next = (Location) adjacent.next();
-//            System.out.println("testando comida em: x" + next.getRow() + " y:" + next.getCol());
+            Object aux = field[next.getRow()][next.getCol()];
+            //System.out.println("É uma classe :" + next.getRow() + " e " + next.getCol() + field[0][0]);
+            //System.out.print("Testando : x" + next.getRow() + " y:" + next.getCol());
             if(field[next.getRow()][next.getCol()] instanceof Food)
             {
-                System.out.println("Comida perto, no ponto: x" + next.getRow() + " y:" + next.getCol());
+                System.out.println(" existe");
+                //System.out.println("Comida perto, no ponto: x" + next.getRow() + " y:" + next.getCol());
                 return next;
-            }
+            }else
+                System.out.println(" nao existe");
         }
         return null;
     }
