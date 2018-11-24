@@ -1,6 +1,7 @@
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -66,7 +67,7 @@ public class Field
     public void place(Object animal, Location location)
     {
         field[location.getRow()][location.getCol()] = animal;
-        System.out.println("Campo : " + location.getRow() + " e " + location.getCol() + " e " + field[location.getRow()][location.getCol()]);
+        //System.out.println("Campo : " + location.getRow() + " e " + location.getCol() + " e " + field[location.getRow()][location.getCol()]);
     }
 
     public void percorrer()
@@ -157,10 +158,10 @@ public class Field
         }
     }
 
-    public Location closestFoodLocation(Location location)
+    public Location closestFoodLocation(Location location, List<Location> busyFields)
     {
         Iterator adjacent = adjacentLocations(location);
-        System.out.println("Location: " + location);
+//        System.out.println("Location: " + location);
         while(adjacent.hasNext())
         {
             Location next = (Location) adjacent.next();
@@ -169,11 +170,20 @@ public class Field
             //System.out.print("Testando : x" + next.getRow() + " y:" + next.getCol());
             if(field[next.getRow()][next.getCol()] instanceof Food)
             {
-                System.out.println(" existe");
-                //System.out.println("Comida perto, no ponto: x" + next.getRow() + " y:" + next.getCol());
-                return next;
-            }else
-                System.out.println(" nao existe");
+                boolean estaOcupado = false;
+                for(Location loc : busyFields)
+                {
+                    if(loc.equals(next))
+                    {
+                        estaOcupado = true;
+                    }
+                }
+                //System.out.println("Nome da classe que deveria ser food: " + field[next.getRow()][next.getCol()]);
+                if (!estaOcupado)
+                    return next;
+                else
+                    System.out.println("Você não pode ir para a localizacao " + next + " porque já estão comendo lá");
+            }
         }
         return null;
     }

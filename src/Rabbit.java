@@ -17,7 +17,7 @@ public class Rabbit
     // The age to which a rabbit can live.
     private static final int MAX_AGE = 190;
     // The likelihood of a rabbit breeding.
-    private static final double BREEDING_PROBABILITY = 0.15;
+    private static final double BREEDING_PROBABILITY = 0.8;
     // The maximum number of births.
     private static final int MAX_LITTER_SIZE = 5;
     // A shared random number generator to control breeding.
@@ -53,7 +53,7 @@ public class Rabbit
      * This is what the rabbit does most of the time - it runs 
      * around. Sometimes it will breed or die of old age.
      */
-    public void run(Field updatedField, List newRabbits)
+    /*public void run(Field updatedField, List newRabbits)
     {
         incrementAge();
         if(alive) {
@@ -66,9 +66,12 @@ public class Rabbit
                 System.out.println("O hp do coelho x: " + location.getCol() + " y: " + location.getRow() +  " agora é hp" + hp);
             }
             else
+            {
                 newLocation = updatedField.freeAdjacentLocation(location);
+            }
             // Only transfer to the updated field if there was a free location
             if(newLocation != null) {
+                
                 setLocation(newLocation);
                 updatedField.place(this, newLocation);
             }
@@ -78,16 +81,17 @@ public class Rabbit
                 System.out.println("o coelho da posicao x: " + location.getCol() + " y: " + location.getRow() + " nao pode se mover ou ficar");
             }
         }
-    }
+    }*/
 
-    public void hunt(Field currentField, Field updatedField, List newRabbits)
+    public void hunt(Field currentField, Field updatedField, List newRabbits, List busyLocations)
     {
         if(isAlive()) {
             // Move towards the source of food if found.
-            Location newLocation = currentField.closestFoodLocation(location);
-
+            Location newLocation = currentField.closestFoodLocation(location, busyLocations);
+            
             if(newLocation != null) {
                 int births = breed();
+                System.out.println("Terá " + births + " filhos");
                 for(int b = 0; b < births; b++) {
                     Rabbit newRabbit = new Rabbit(false);
                     newRabbits.add(newRabbit);
@@ -95,8 +99,7 @@ public class Rabbit
                     newRabbit.setLocation(loc);
                     updatedField.place(newRabbit, loc);
                 }
-                System.out.println("Nome da classe: " + updatedField.getObjectAt(newLocation));
-                Food food = (Food)updatedField.getObjectAt(newLocation);
+                Food food = (Food) currentField.getObjectAt(newLocation);
                 if (food != null)
                     food.setEaten();
             }
@@ -104,6 +107,7 @@ public class Rabbit
                 newLocation = updatedField.freeAdjacentLocation(location);
             // Only transfer to the updated field if there was a free location
             if(newLocation != null) {
+                busyLocations.add(newLocation);
                 setLocation(newLocation);
                 updatedField.place(this, newLocation);
             }
@@ -131,7 +135,7 @@ public class Rabbit
     private int breed()
     {
         int births = 0;
-        if(rand.nextDouble() <= BREEDING_PROBABILITY) {
+        if(rand.nextDouble() <= BREEDING_PROBABILITY) {          
             births = rand.nextInt(MAX_LITTER_SIZE) + 1;
         }
         return births;
