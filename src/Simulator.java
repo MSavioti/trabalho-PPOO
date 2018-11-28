@@ -27,19 +27,19 @@ public class Simulator extends JFrame implements KeyListener
     // The default depth of the grid.
     private static final int DEFAULT_DEPTH = 50;
     // The probability that a fox will be created in any given grid position.
-    private static final double FOX_CREATION_PROBABILITY = 0.06;
+    private static final double FOX_CREATION_PROBABILITY = 0.05;
     // The probability that a rabbit will be created in any given grid position.
-    private static final double RABBIT_CREATION_PROBABILITY = 0.08;
+    private static final double RABBIT_CREATION_PROBABILITY = 0.125;
     
-    private static final double FOOD_CREATION_PROBABILITY = 0.08;
+    private static final double FOOD_CREATION_PROBABILITY = 0.1;
     // The value in seconds that the grid will takes to refresh
     private static final int SECONDS_TO_REFRESH = 10;
     // The Timer object
     private Timer timer;
     // The list of elements in the field
     private List elements;
+
     // The list of elements just born
-    
     private List newElements;
     // The current state of the field.
     private Field field;
@@ -49,6 +49,8 @@ public class Simulator extends JFrame implements KeyListener
     private int step;
     // A graphical view of the simulation.
     private SimulatorView view;
+
+    private Random rand = new Random();
     
     /**
      * Construct a simulation field with default size.
@@ -56,7 +58,7 @@ public class Simulator extends JFrame implements KeyListener
     public Simulator()
     {
         //this(DEFAULT_DEPTH, DEFAULT_WIDTH);
-        this(10,10);
+        this(15,15);
     }
     
     @Override
@@ -146,6 +148,7 @@ public class Simulator extends JFrame implements KeyListener
         // let all elements act
         for(Iterator iter = elements.iterator(); iter.hasNext(); ) {
             Object element = iter.next();
+
             if(element instanceof Rabbit) {
                 Rabbit rabbit = (Rabbit)element;
                 if(rabbit.isAlive()) {
@@ -173,13 +176,41 @@ public class Simulator extends JFrame implements KeyListener
                     iter.remove();
                 }
             }
-            else {
-                System.out.println("found unknown element");
-            }
         }
+
         // add new born elements to the list of elements
         elements.addAll(newElements);
-        
+
+        //try to instantiate grass on every location
+        for(int row = 0; row < field.getDepth(); row++) {
+            for(int col = 0; col < field.getWidth(); col++) {
+
+                if(rand.nextDouble() <= FOOD_CREATION_PROBABILITY) {
+                    Location currentLocation = new Location(row, col);
+                    boolean positionTaken = false;
+
+                    // verifies if current location is already taken by any element
+                    for(Object object : elements) {
+                        if (object instanceof GameObject){
+                            GameObject gameObject = (GameObject) object;
+                            //System.out.println("GameObject X: " + gameObject.getLocation().getRow());
+                            //System.out.println("GameObject Y: " + gameObject.getLocation().getRow());
+                            if (gameObject.getLocation().equals(currentLocation)) {
+                                positionTaken = true;
+                            }
+                        }
+                    }
+
+                    if (!positionTaken) {
+                        System.out.println("creating grass");
+                        Food food = new Food();
+                        elements.add(food);
+                        food.setLocation(currentLocation.getRow(), currentLocation.getCol());
+                        field.place(food, currentLocation.getRow(), currentLocation.getCol());
+                    }
+                }
+            }
+        }
         // Swap the field and updatedField at the end of the step.
         Field temp = field;
         field = updatedField;
@@ -189,7 +220,6 @@ public class Simulator extends JFrame implements KeyListener
         // display the new field on screen
         view.showStatus(step, field);
     }
-        
     /**
      * Reset the simulation to a starting position.
      */
@@ -210,17 +240,16 @@ public class Simulator extends JFrame implements KeyListener
      */
     private void populate(Field field)
     {
-        Random rand = new Random();
         field.clear();
         for(int row = 0; row < field.getDepth(); row++) {
             for(int col = 0; col < field.getWidth(); col++) {
                 if(rand.nextDouble() <= FOX_CREATION_PROBABILITY) {
-                    Fox fox = new Fox(true);
+                    Fox fox = new Fox(false);
                     elements.add(fox);
                     fox.setLocation(row, col);
                     field.place(fox, row, col);
                 } else if(rand.nextDouble() <= RABBIT_CREATION_PROBABILITY) {
-                    Rabbit rabbit = new Rabbit(true);
+                    Rabbit rabbit = new Rabbit(false);
                     elements.add(rabbit);
                     rabbit.setLocation(row, col);
                     field.place(rabbit, row, col);

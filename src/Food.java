@@ -2,7 +2,7 @@
 import java.util.List;
 import java.util.Random;
 
-public class Food
+public class Food extends GameObject
 {
     private Location location;
     private static final double SPAWNING_PROBABILITY = 0.8;
