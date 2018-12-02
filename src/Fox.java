@@ -14,16 +14,16 @@ public class Fox extends GameObject
     // Characteristics shared by all foxes (static fields).
     
     // The age at which a fox can start to breed.
-    private static final int BREEDING_AGE = 5;
+    private static final int BREEDING_AGE = 10;
     // The age to which a fox can live.
-    private static final int MAX_AGE = 20;
+    private static final int MAX_AGE = 150;
     // The likelihood of a fox breeding.
-    private static final double BREEDING_PROBABILITY = 0.2;
+    private static final double BREEDING_PROBABILITY = 0.09;
     // The maximum number of births.
-    private static final int MAX_LITTER_SIZE = 1;
+    private static final int MAX_LITTER_SIZE = 3;
     // The food value of a single rabbit. In effect, this is the
     // number of steps a fox can go before it has to eat again.
-    private static final int RABBIT_FOOD_VALUE = 10;
+    private static final int RABBIT_FOOD_VALUE = 4;
     // A shared random number generator to control breeding.
     private static final Random rand = new Random();
     
@@ -34,12 +34,10 @@ public class Fox extends GameObject
     // Whether the fox is alive or not.
     private boolean alive;
     // The fox's position
-    //private Location location;
+    private Location location;
     // The fox's food level, which is increased by eating rabbits.
     private int foodLevel;
 
-    //tells if the fox has eaten yet
-    private boolean hasEatenYet;
     /**
      * Create a fox. A fox can be created as a new born (age zero
      * and not hungry) or with random age.
@@ -50,15 +48,14 @@ public class Fox extends GameObject
     {
         age = 0;
         alive = true;
-        foodLevel = 15;
-        /*if(randomAge) {
+        if(randomAge) {
             age = rand.nextInt(MAX_AGE);
-            //foodLevel = rand.nextInt(RABBIT_FOOD_VALUE);
+            foodLevel = rand.nextInt(RABBIT_FOOD_VALUE);
         }
         else {
             // leave age at 0
             foodLevel = RABBIT_FOOD_VALUE;
-        }*/
+        }
     }
     
     /**
@@ -68,34 +65,30 @@ public class Fox extends GameObject
      */
     public void hunt(Field currentField, Field updatedField, List newFoxes)
     {
-        hasEatenYet = false;
-
+        incrementAge();
+        incrementHunger();
         if(isAlive()) {
-            incrementAge();
-            incrementHunger();
-
-            // Move towards the source of food if found.
-            Location newLocation = findFood(currentField, location, hasEatenYet);
-            if(newLocation == null) {  // no food found - move randomly
-                newLocation = currentField.freeAdjacentLocation(location);
-                if(updatedField.getObjectAt(newLocation) != null)
-                    newLocation = null;
-//                updatedField.percorrer();
-//                currentField.percorrer();
-//                System.out.println("New location da fox: " + newLocation);
-            } else //found food
-            {
-                hasEatenYet = true;
-                if (canBreed()) {
-                    //breed(updatedField, newFoxes);
-                }
+            // New foxes are born into adjacent locations.
+            int births = breed();
+            for(int b = 0; b < births; b++) {
+                Fox newFox = new Fox(false);
+                newFoxes.add(newFox);
+                Location loc = updatedField.randomAdjacentLocation(location);
+                newFox.setLocation(loc);
+                updatedField.place(newFox, loc);
             }
-
+            // Move towards the source of food if found.
+            Location newLocation = findFood(currentField, location);
+            if(newLocation == null) {  // no food found - move randomly
+                newLocation = updatedField.freeAdjacentLocation(location);
+            }
             if(newLocation != null) {
                 setLocation(newLocation);
-                System.out.println("Teste: " + updatedField.getObjectAt(newLocation) +
-                        " outro: " + currentField.getObjectAt(newLocation));
                 updatedField.place(this, newLocation);
+            }
+            else {
+                // can neither move nor stay - overcrowding - all locations taken
+                alive = false;
             }
         }
     }
@@ -106,10 +99,9 @@ public class Fox extends GameObject
     private void incrementAge()
     {
         age++;
-//        if(age > MAX_AGE) {
-//            alive = false;
-//            System.out.println("a raposa da posicao x: " + location.getCol() + " y: " + location.getRow() + " morreu por velhice");
-//        }
+        if(age > MAX_AGE) {
+            alive = false;
+        }
     }
     
     /**
@@ -118,10 +110,9 @@ public class Fox extends GameObject
     private void incrementHunger()
     {
         foodLevel--;
-//        if(foodLevel <= 0) {
-//            alive = false;
-//            System.out.println("a raposa da posicao x: " + location.getCol() + " y: " + location.getRow() + " morreu por fome");
-//        }
+        if(foodLevel <= 0) {
+            alive = false;
+        }
     }
     
     /**
@@ -130,20 +121,19 @@ public class Fox extends GameObject
      * @param location Where in the field it is located.
      * @return Where food was found, or null if it wasn't.
      */
-    private Location findFood(Field field, Location location, Boolean _hasEaten)
+    private Location findFood(Field field, Location location)
     {
         Iterator adjacentLocations = field.adjacentLocations(location);
+        boolean hasEatenYet = false;
 
-        while(adjacentLocations.hasNext() && !_hasEaten) {
+        while(adjacentLocations.hasNext() && !hasEatenYet) {
             Location where = (Location) adjacentLocations.next();
             Object animal = field.getObjectAt(where);
-
             if(animal instanceof Rabbit) {
-                _hasEaten = true;
+                hasEatenYet = true;
                 Rabbit rabbit = (Rabbit) animal;
-
-                if(rabbit.isAlive()) { 
-                    rabbit.beEaten();
+                if(rabbit.isAlive()) {
+                    rabbit.setEaten();
                     foodLevel = RABBIT_FOOD_VALUE;
                     return where;
                 }
@@ -157,22 +147,13 @@ public class Fox extends GameObject
      * if it can breed.
      * @return The number of births (may be zero).
      */
-    private void breed(Field updatedField, List newFoxes)
+    private int breed()
     {
-        if (rand.nextDouble() <= BREEDING_PROBABILITY)
-        {
-            int births = rand.nextInt(MAX_LITTER_SIZE + 1);
-
-            for(int b = 0; b < births; b++)
-            {
-                Fox newFox = new Fox(false);
-                newFoxes.add(newFox);
-                Location loc = updatedField.randomAdjacentLocation(location);
-                newFox.setLocation(loc);
-                updatedField.place(newFox, loc);
-            }
+        int births = 0;
+        if(canBreed() && rand.nextDouble() <= BREEDING_PROBABILITY) {
+            births = rand.nextInt(MAX_LITTER_SIZE) + 1;
         }
-
+        return births;
     }
 
     /**

@@ -1,3 +1,4 @@
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -13,13 +14,16 @@ public class Rabbit extends GameObject
     // Characteristics shared by all rabbits (static fields).
 
     // The age at which a rabbit can start to breed.
-    private static final int BREEDING_AGE = 3;
+    private static final int BREEDING_AGE = 5;
     // The age to which a rabbit can live.
-    private static final int MAX_AGE = 12;
+    private static final int MAX_AGE = 50;
     // The likelihood of a rabbit breeding.
-    private static final double BREEDING_PROBABILITY = 0.6;
+    private static final double BREEDING_PROBABILITY = 0.15;
     // The maximum number of births.
     private static final int MAX_LITTER_SIZE = 3;
+    // The food value of a single rabbit. In effect, this is the
+    // number of steps a fox can go before it has to eat again.
+    private static final int GRASS_FOOD_VALUE = 4;
     // A shared random number generator to control breeding.
     private static final Random rand = new Random();
     
@@ -30,12 +34,10 @@ public class Rabbit extends GameObject
     // Whether the rabbit is alive or not.
     private boolean alive;
     // The rabbit's position
-    //private Location location;
+    private Location location;
     // The fox's food level, which is increased by eating rabbits.
     private int foodLevel;
 
-    //tells if the fox has eaten yet
-    private boolean hasEatenYet;
     /**
      * Create a new rabbit. A rabbit may be created with age
      * zero (a new born) or with a random age.
@@ -44,57 +46,97 @@ public class Rabbit extends GameObject
      */
     public Rabbit(boolean randomAge)
     {
-
         age = 0;
         alive = true;
-        hasEatenYet = false;
-        foodLevel = 10;
-        /*if(randomAge) {
+        foodLevel = GRASS_FOOD_VALUE;
+        if(randomAge) {
             age = rand.nextInt(MAX_AGE);
-        }*/
+        }
     }
-
-    public void hunt(Field currentField, Field updatedField, List newRabbits)
+    
+    /**
+     * This is what the rabbit does most of the time - it runs 
+     * around. Sometimes it will breed or die of old age.
+     */
+    /*
+    public void run(Field updatedField, List newRabbits)
     {
-
-        if(isAlive()) {
-            //breed(updatedField, newRabbits);
-            hasEatenYet = false;
-            incrementAge();
-            incrementHunger();
-            // Move towards the source of food if found.
-            Location newLocation = currentField.closestFoodLocation(location);
-            if(newLocation != null) { //search for food
-                Food food = (Food) currentField.getObjectAt(newLocation);
-
-                if (food != null)
-                { //found food
-                    food.setEaten();
-                    hasEatenYet = true;
-                    foodLevel += 8;
-
-                    if (canBreed()) {
-                        breed(updatedField, newRabbits);
-                    }
-                }
+        incrementAge();
+        if(alive) {
+            int births = breed();
+            for(int b = 0; b < births; b++) {
+                Rabbit newRabbit = new Rabbit(false);
+                newRabbits.add(newRabbit);
+                Location loc = updatedField.randomAdjacentLocation(location);
+                newRabbit.setLocation(loc);
+                updatedField.place(newRabbit, loc);
             }
-            if(newLocation == null) {
-                newLocation = updatedField.freeAdjacentLocation(location);
-                if(currentField.getObjectAt(newLocation) != null)
-                    newLocation = null;
-                //System.out.println("estou em : " + location);
-                //currentField.percorrer();
-            }
-
+            Location newLocation = updatedField.freeAdjacentLocation(location);
             // Only transfer to the updated field if there was a free location
             if(newLocation != null) {
                 setLocation(newLocation);
-//                System.out.println("new location: " + newLocation + "lá tem: " + currentField.getObjectAt(newLocation));
                 updatedField.place(this, newLocation);
+            }
+            else {
+                // can neither move nor stay - overcrowding - all locations taken
+                alive = false;
+            }
+        }
+    }*/
+
+    public void hunt(Field currentField, Field updatedField, List newRabbits)
+    {
+        incrementAge();
+        incrementHunger();
+        if(isAlive()) {
+            // Move towards the source of food if found.
+            Location newLocation = findFood(currentField, location);
+            if(newLocation == null) {  // no food found - move randomly
+                newLocation = updatedField.freeAdjacentLocation(location);
+            }
+            else { //found food
+                int births = breed(); //only breed if have eaten
+                for(int b = 0; b < births; b++) {
+                    Rabbit newRabbit = new Rabbit(false);
+                    newRabbits.add(newRabbit);
+                    Location loc = updatedField.randomAdjacentLocation(location);
+                    newRabbit.setLocation(loc);
+                    updatedField.place(newRabbit, loc);
+                }
+            }
+
+            if(newLocation != null) {
+                setLocation(newLocation);
+                updatedField.place(this, newLocation);
+            }
+            else {
+                // can neither move nor stay - overcrowding - all locations taken
+                alive = false;
             }
         }
     }
 
+    private Location findFood(Field field, Location location)
+    {
+        Iterator adjacentLocations = field.adjacentLocations(location);
+        boolean hasEatenYet = false;
+
+        while(adjacentLocations.hasNext() && !hasEatenYet) {
+            Location where = (Location) adjacentLocations.next();
+            Object object = field.getObjectAt(where);
+            if(object instanceof Rabbit) {
+                hasEatenYet = true;
+                Grass grass = (Grass) object;
+                if(grass.exists()) {
+                    grass.setEaten();
+                    foodLevel = GRASS_FOOD_VALUE;
+                    return where;
+                }
+            }
+        }
+        return null;
+    }
+    
     /**
      * Increase the age.
      * This could result in the rabbit's death.
@@ -104,7 +146,6 @@ public class Rabbit extends GameObject
         age++;
         if(age > MAX_AGE) {
             alive = false;
-            System.out.println("o coelho da posicao x: " + location.getCol() + " y: " + location.getRow() + " morreu por velhice");
         }
     }
 
@@ -116,7 +157,6 @@ public class Rabbit extends GameObject
         foodLevel--;
         if(foodLevel <= 0) {
             alive = false;
-            System.out.println("o coelho da posicao x: " + location.getCol() + " y: " + location.getRow() + " morreu por fome");
         }
     }
     
@@ -125,21 +165,13 @@ public class Rabbit extends GameObject
      * if it can breed.
      * @return The number of births (may be zero).
      */
-    private void breed(Field updatedField, List newRabbits)
+    private int breed()
     {
-        if(rand.nextDouble() <= BREEDING_PROBABILITY) {
-            int births = rand.nextInt(MAX_LITTER_SIZE) + 1;
-//            System.out.println("Terá " + births + " filhos");
-
-            for(int b = 0; b < births; b++) {
-                Rabbit newRabbit = new Rabbit(false);
-                newRabbits.add(newRabbit);
-                Location loc = updatedField.freeAdjacentLocation(location);
-//                System.out.println(loc);
-                newRabbit.setLocation(loc);
-                updatedField.place(newRabbit, loc);
-            }
+        int births = 0;
+        if(canBreed() && rand.nextDouble() <= BREEDING_PROBABILITY) {
+            births = rand.nextInt(MAX_LITTER_SIZE) + 1;
         }
+        return births;
     }
 
     /**
@@ -149,7 +181,6 @@ public class Rabbit extends GameObject
     {
         return age >= BREEDING_AGE;
     }
-
     
     /**
      * Check whether the rabbit is alive or not.
@@ -161,12 +192,11 @@ public class Rabbit extends GameObject
     }
 
     /**
-     * Tell the grass that it's dead now :(
+     * Tell the rabbit that it's dead now :(
      */
-    public void beEaten()
+    public void setEaten()
     {
         alive = false;
-        System.out.println("o coelho da posicao x: " + location.getCol() + " y: " + location.getRow() + " foi comido");
     }
     
     /**

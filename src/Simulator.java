@@ -1,15 +1,12 @@
+import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Random;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Collections;
 import java.awt.Color;
-import java.awt.event.KeyEvent;
-import javax.swing.*;
-
-import java.awt.event.KeyListener;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * A simple predator-prey simulator, based on a field containing
@@ -23,22 +20,18 @@ public class Simulator extends JFrame implements KeyListener
     // The private static final variables represent 
     // configuration information for the simulation.
     // The default width for the grid.
-    private static final int DEFAULT_WIDTH = 50;
+    private static final int DEFAULT_WIDTH = 20;
     // The default depth of the grid.
-    private static final int DEFAULT_DEPTH = 50;
+    private static final int DEFAULT_DEPTH = 20;
     // The probability that a fox will be created in any given grid position.
-    private static final double FOX_CREATION_PROBABILITY = 0.07;
+    private static final double FOX_CREATION_PROBABILITY = 0.02;
     // The probability that a rabbit will be created in any given grid position.
     private static final double RABBIT_CREATION_PROBABILITY = 0.08;
-    
-    private static final double FOOD_CREATION_PROBABILITY = 0.1;
-    // The value in seconds that the grid will takes to refresh
-    private static final int SECONDS_TO_REFRESH = 10;
-    // The Timer object
-    private Timer timer;
+    // The probability that a rabbit will be created in any given grid position.
+    private static final double GRASS_CREATION_PROBABILITY = 0.025;
+
     // The list of elements in the field
     private List elements;
-
     // The list of elements just born
     private List newElements;
     // The current state of the field.
@@ -50,26 +43,25 @@ public class Simulator extends JFrame implements KeyListener
     // A graphical view of the simulation.
     private SimulatorView view;
 
-    private Random rand = new Random();
-    
-    /**
-     * Construct a simulation field with default size.
-     */
-    public Simulator()
-    {
-        //this(DEFAULT_DEPTH, DEFAULT_WIDTH);
-        this(5,5);
-    }
-    
+    private Random rand;
+
     @Override
     public void keyPressed(KeyEvent e)
     {
-        simulateOneStep();   
+        simulateOneStep();
     }
     @Override
     public void keyReleased(KeyEvent e){}
     @Override
     public void keyTyped(KeyEvent e) {}
+    /**
+     * Construct a simulation field with default size.
+     */
+    public Simulator()
+    {
+        this(DEFAULT_DEPTH, DEFAULT_WIDTH);
+    }
+    
     /**
      * Create a simulation field with the given size.
      * @param depth Depth of the field. Must be greater than zero.
@@ -90,35 +82,20 @@ public class Simulator extends JFrame implements KeyListener
 
         // Create a view of the state of each location in the field.
         view = new SimulatorView(depth, width);
-        view.addKeyListener(this);
-        
         view.setColor(Fox.class, Color.blue);
         view.setColor(Rabbit.class, Color.orange);
-        view.setColor(Food.class, Color.green);
+        view.setColor(Grass.class, Color.green);
+
+        rand = new Random();
         
         // Setup a valid starting point.
         reset();
-        // After showing the first step, the grid will refresh at every SECONDS_TO_REFRESH seconds
-        //runStepByStep();
     }
     
     /**
      * Run the simulation from its current state for a reasonably long period,
      * e.g. 500 steps.
      */
-    public void runStepByStep()
-    {
-        class RemindTask extends TimerTask
-        {
-            public void run()
-            {
-                simulateOneStep();
-            }
-        }
-        timer = new Timer();
-        timer.schedule(new RemindTask(), SECONDS_TO_REFRESH * 1000, SECONDS_TO_REFRESH * 1000);
-    }
-    
     public void runLongSimulation()
     {
         simulate(500);
@@ -144,76 +121,80 @@ public class Simulator extends JFrame implements KeyListener
     {
         step++;
         newElements.clear();
+        
         // let all elements act
         for(Iterator iter = elements.iterator(); iter.hasNext(); ) {
-            Object element = iter.next();
-            if(element instanceof Rabbit) {
-                Rabbit rabbit = (Rabbit)element;
+            Object object = iter.next();
+            if(object instanceof Rabbit) {
+                Rabbit rabbit = (Rabbit)object;
                 if(rabbit.isAlive()) {
                     rabbit.hunt(field, updatedField, newElements);
                 }
                 else {
                     iter.remove();   // remove dead rabbits from collection
                 }
-            } else if(element instanceof Fox) {
-                Fox fox = (Fox)element;
+            }
+            else if(object instanceof Fox) {
+                Fox fox = (Fox)object;
                 if(fox.isAlive()) {
                     fox.hunt(field, updatedField, newElements);
                 }
                 else {
                     iter.remove();   // remove dead foxes from collection
                 }
-            } else if(element instanceof Food)
-            {
-                Food food = (Food)element;
-                if(food.exists())
-                {
-                    food.refresh(field, updatedField);
-                }else
-                {
+            }
+            else if (object instanceof Grass) {
+                Grass grass = (Grass) object;
+                if (grass.exists()) {
+                    grass.refresh(field, updatedField);
+                }
+                else {
                     iter.remove();
                 }
             }
-        }
-
-        // add new born elements to the list of elements
-
-        //try to instantiate grass on every location
-        for(int row = 0; row < field.getDepth(); row++)
-        {
-            for(int col = 0; col < field.getWidth(); col++) {
-//                System.out.print(updatedField.getObjectAt(row,col) + " ");
-                if(rand.nextDouble() <= FOOD_CREATION_PROBABILITY) {
-                    Location currentLocation = new Location(row, col);
-                    GameObject gameObj = (GameObject) updatedField.getObjectAt(row, col);
-                    GameObject gameObj2 = (GameObject) field.getObjectAt(row, col);
-                    //updatedField.percorrer();
-                    boolean positionTaken = false;
-                    if(gameObj != null || gameObj2 != null)
-                        positionTaken = true;
-                    if (!positionTaken) {
-                        //System.out.println("\t\tCurrent location:" + currentLocation);
-                        Food food = new Food();
-                        food.setLocation(currentLocation.getRow(), currentLocation.getCol());
-                        newElements.add(food);
-//                        System.out.println("Setando em row " + row + " col: " + col + " : " + updatedField.getObjectAt(row, col));
-                        updatedField.place(food, row, col);
-//                        System.out.println("Result: " + updatedField.getObjectAt(row, col));
-                    }
-                }
+            else {
+                System.out.println("found unknown animal");
             }
-//            System.out.println("");
         }
-        // Swap the field and updatedField at the end of the step.
+        // add new born elements to the list of elements
         elements.addAll(newElements);
+        
+        // Swap the field and updatedField at the end of the step.
         Field temp = field;
         field = updatedField;
         updatedField = temp;
         updatedField.clear();
 
+        //grass grows at every step, but only after everyone took its action
+        for(int row = 0; row < field.getDepth(); row++)
+        {
+            for(int col = 0; col < field.getWidth(); col++) {
+//                System.out.print(updatedField.getObjectAt(row,col) + " ");
+                if(rand.nextDouble() <= GRASS_CREATION_PROBABILITY) {
+                    Location currentLocation = new Location(row, col);
+                    GameObject gameObj = (GameObject) updatedField.getObjectAt(row, col);
+                    GameObject gameObj2 = (GameObject) field.getObjectAt(row, col);
+                    //updatedField.percorrer();
+                    boolean positionTaken = false;
+
+                    if(gameObj != null || gameObj2 != null)
+                        positionTaken = true;
+
+                    if (!positionTaken) {
+                        Food food = new Food();
+                        food.setLocation(currentLocation.getRow(), currentLocation.getCol());
+                        elements.add(food);
+                        updatedField.place(food, row, col);
+                    }
+                }
+            }
+//            System.out.println("");
+        }
+
         // display the new field on screen
         view.showStatus(step, field);
     }
+        
     /**
      * Reset the simulation to a starting position.
      */
@@ -235,28 +216,26 @@ public class Simulator extends JFrame implements KeyListener
     private void populate(Field field)
     {
         field.clear();
-        int podeCriar = 0;
         for(int row = 0; row < field.getDepth(); row++) {
             for(int col = 0; col < field.getWidth(); col++) {
-                if(rand.nextDouble() <= FOX_CREATION_PROBABILITY && podeCriar < 4) {
+                if(rand.nextDouble() <= FOX_CREATION_PROBABILITY) {
                     Fox fox = new Fox(false);
                     elements.add(fox);
                     fox.setLocation(row, col);
                     field.place(fox, row, col);
-                    podeCriar++;
-                } else if(rand.nextDouble() <= RABBIT_CREATION_PROBABILITY) {
+                }
+                else if(rand.nextDouble() <= RABBIT_CREATION_PROBABILITY) {
                     Rabbit rabbit = new Rabbit(false);
                     elements.add(rabbit);
                     rabbit.setLocation(row, col);
                     field.place(rabbit, row, col);
-                } else if(rand.nextDouble() <= FOOD_CREATION_PROBABILITY) {
-                    Food food = new Food();
-                    elements.add(food);
-                    food.setLocation(row, col);
-                    //System.out.println("Imprimindo: " + food.getLocation());
-                    field.place(food, row, col);
                 }
-               
+                else if (rand.nextDouble() <= GRASS_CREATION_PROBABILITY) {
+                    Grass grass = new Grass();
+                    elements.add(grass);
+                    grass.setLocation(row, col);
+                    field.place(grass, row, col);
+                }
                 // else leave the location empty.
             }
         }

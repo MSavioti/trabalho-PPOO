@@ -1,7 +1,6 @@
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -67,19 +66,8 @@ public class Field
     public void place(Object animal, Location location)
     {
         field[location.getRow()][location.getCol()] = animal;
-        //System.out.println("Campo : " + location.getRow() + " e " + location.getCol() + " e " + field[location.getRow()][location.getCol()]);
     }
-
-    public void percorrer()
-    {
-        System.out.println("Percorrendo: ");
-        for (int i = 0; i < depth; i++) {
-            for (int j = 0; j < width; j++) {
-                System.out.print(field[i][j] + " ");
-            }
-            System.out.println();
-        }
-    }
+    
     /**
      * Return the animal at the given location, if any.
      * @param location Where in the field.
@@ -146,13 +134,11 @@ public class Field
         while(adjacent.hasNext()) {
             Location next = (Location) adjacent.next();
             if(field[next.getRow()][next.getCol()] == null) {
-//                System.out.println("Imprimindo next: " + field[next.getRow()][next.getCol()]);    
                 return next;
             }
         }
         // check whether current location is free
         if(field[location.getRow()][location.getCol()] == null) {
-            System.out.println("Imprimindo next: " + field[location.getRow()][location.getCol()]);    
             return location;
         } 
         else {
@@ -160,28 +146,6 @@ public class Field
         }
     }
 
-    public Location closestFoodLocation(Location location)
-    {
-        Iterator adjacent = adjacentLocations(location);
-//        System.out.println("Location: " + location);
-        while(adjacent.hasNext())
-        {
-            Location next = (Location) adjacent.next();
-            Object aux = field[next.getRow()][next.getCol()];
-            //System.out.println("É uma classe :" + next.getRow() + " e " + next.getCol() + field[0][0]);
-            //System.out.print("Testando : x" + next.getRow() + " y:" + next.getCol());
-            if(field[next.getRow()][next.getCol()] instanceof Food)
-            {
-                //System.out.println("Nome da classe que deveria ser food: " + field[next.getRow()][next.getCol()]);
-                if (((Food)field[next.getRow()][next.getCol()]).exists())
-                    return next;
-//                else
-//                    System.out.println("Você não pode ir para a localizacao " + next + " porque já estão comendo lá");
-            }
-        }
-        return null;
-    }
-    
     /**
      * Generate an iterator over a shuffled list of locations adjacent
      * to the given one. The list will not include the location itself.

@@ -15,10 +15,9 @@ import java.util.HashMap;
  */
 public class SimulatorView extends JFrame
 {
-
     // Colors used for empty locations.
     private static final Color EMPTY_COLOR = Color.white;
-    
+
     // Color used for objects that have no defined color.
     private static final Color UNKNOWN_COLOR = Color.gray;
 
@@ -31,8 +30,7 @@ public class SimulatorView extends JFrame
     private HashMap colors;
     // A statistics object computing and storing simulation information
     private FieldStats stats;
-    
-    
+
     /**
      * Create a view of the given width and height.
      */
