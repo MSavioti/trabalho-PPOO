@@ -73,8 +73,8 @@ public class Field
     public void percorrer()
     {
         System.out.println("Percorrendo: ");
-        for (int i = 0; i < 7; i++) {
-            for (int j = 0; j < 7; j++) {
+        for (int i = 0; i < depth; i++) {
+            for (int j = 0; j < width; j++) {
                 System.out.print(field[i][j] + " ");
             }
             System.out.println();
@@ -146,11 +146,13 @@ public class Field
         while(adjacent.hasNext()) {
             Location next = (Location) adjacent.next();
             if(field[next.getRow()][next.getCol()] == null) {
+//                System.out.println("Imprimindo next: " + field[next.getRow()][next.getCol()]);    
                 return next;
             }
         }
         // check whether current location is free
         if(field[location.getRow()][location.getCol()] == null) {
+            System.out.println("Imprimindo next: " + field[location.getRow()][location.getCol()]);    
             return location;
         } 
         else {
@@ -173,8 +175,8 @@ public class Field
                 //System.out.println("Nome da classe que deveria ser food: " + field[next.getRow()][next.getCol()]);
                 if (((Food)field[next.getRow()][next.getCol()]).exists())
                     return next;
-                else
-                    System.out.println("Você não pode ir para a localizacao " + next + " porque já estão comendo lá");
+//                else
+//                    System.out.println("Você não pode ir para a localizacao " + next + " porque já estão comendo lá");
             }
         }
         return null;

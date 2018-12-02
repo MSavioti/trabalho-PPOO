@@ -144,11 +144,9 @@ public class Simulator extends JFrame implements KeyListener
     {
         step++;
         newElements.clear();
-        List busyLocations = new ArrayList<Field>();
         // let all elements act
         for(Iterator iter = elements.iterator(); iter.hasNext(); ) {
             Object element = iter.next();
-
             if(element instanceof Rabbit) {
                 Rabbit rabbit = (Rabbit)element;
                 if(rabbit.isAlive()) {
@@ -179,39 +177,37 @@ public class Simulator extends JFrame implements KeyListener
         }
 
         // add new born elements to the list of elements
-        elements.addAll(newElements);
 
         //try to instantiate grass on every location
-        for(int row = 0; row < field.getDepth(); row++) {
+        int contadorCriados = 0;
+        for(int row = 0; row < field.getDepth(); row++)
+        {
             for(int col = 0; col < field.getWidth(); col++) {
-
+//                System.out.print(updatedField.getObjectAt(row,col) + " ");
                 if(rand.nextDouble() <= FOOD_CREATION_PROBABILITY) {
                     Location currentLocation = new Location(row, col);
+                    GameObject gameObj = (GameObject) updatedField.getObjectAt(row, col);
+                    GameObject gameObj2 = (GameObject) field.getObjectAt(row, col);
+                    //updatedField.percorrer();
                     boolean positionTaken = false;
-
-                    // verifies if current location is already taken by any element
-                    for(Object object : elements) {
-                        if (object instanceof GameObject){
-                            GameObject gameObject = (GameObject) object;
-                            //System.out.println("GameObject X: " + gameObject.getLocation().getRow());
-                            //System.out.println("GameObject Y: " + gameObject.getLocation().getRow());
-                            if (gameObject.getLocation().equals(currentLocation)) {
-                                positionTaken = true;
-                            }
-                        }
-                    }
-
+                    if(gameObj != null || gameObj2 != null)
+                        positionTaken = true;
                     if (!positionTaken) {
-                        System.out.println("creating grass");
+                        //System.out.println("\t\tCurrent location:" + currentLocation);
+                        contadorCriados++;
                         Food food = new Food();
-                        elements.add(food);
                         food.setLocation(currentLocation.getRow(), currentLocation.getCol());
-                        field.place(food, currentLocation.getRow(), currentLocation.getCol());
+                        newElements.add(food);
+//                        System.out.println("Setando em row " + row + " col: " + col + " : " + updatedField.getObjectAt(row, col));
+                        updatedField.place(food, row, col);
+//                        System.out.println("Result: " + updatedField.getObjectAt(row, col));
                     }
                 }
             }
+//            System.out.println("");
         }
         // Swap the field and updatedField at the end of the step.
+        elements.addAll(newElements);
         Field temp = field;
         field = updatedField;
         updatedField = temp;
@@ -219,6 +215,7 @@ public class Simulator extends JFrame implements KeyListener
 
         // display the new field on screen
         view.showStatus(step, field);
+//        System.out.println(contadorCriados + " comidas criadas");
     }
     /**
      * Reset the simulation to a starting position.

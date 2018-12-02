@@ -58,17 +58,17 @@ public class Rabbit extends GameObject
     {
 
         if(isAlive()) {
-            breed(updatedField, newRabbits);
+            //breed(updatedField, newRabbits);
             hasEatenYet = false;
             incrementAge();
             incrementHunger();
             // Move towards the source of food if found.
             Location newLocation = currentField.closestFoodLocation(location);
-            
             if(newLocation != null) { //search for food
                 Food food = (Food) currentField.getObjectAt(newLocation);
 
-                if (food != null) //found food
+                if (food != null)
+                { //found food
                     food.setEaten();
                     hasEatenYet = true;
                     foodLevel += 8;
@@ -76,14 +76,18 @@ public class Rabbit extends GameObject
                     if (canBreed()) {
                         breed(updatedField, newRabbits);
                     }
+                }
             }
-            while(newLocation == null) {
+            if(newLocation == null) {
                 newLocation = updatedField.freeAdjacentLocation(location);
+                //System.out.println("estou em : " + location);
+                //currentField.percorrer();
             }
 
             // Only transfer to the updated field if there was a free location
             if(newLocation != null) {
                 setLocation(newLocation);
+                System.out.println("new location: " + newLocation + "lá tem: " + currentField.getObjectAt(newLocation));
                 updatedField.place(this, newLocation);
             }
         }
@@ -127,12 +131,11 @@ public class Rabbit extends GameObject
 
             for(int b = 0; b < births; b++) {
                 Rabbit newRabbit = new Rabbit(false);
-//                newRabbits.add(newRabbit);
-                Location loc = updatedField.randomAdjacentLocation(location);
+                newRabbits.add(newRabbit);
+                Location loc = updatedField.freeAdjacentLocation(location);
                 System.out.println(loc);
-//
-//                newRabbit.setLocation(loc);
-//                updatedField.place(newRabbit, loc);
+                newRabbit.setLocation(loc);
+                updatedField.place(newRabbit, loc);
             }
         }
     }
