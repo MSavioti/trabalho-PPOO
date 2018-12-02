@@ -19,7 +19,7 @@ public class Rabbit extends GameObject
     // The likelihood of a rabbit breeding.
     private static final double BREEDING_PROBABILITY = 0.6;
     // The maximum number of births.
-    private static final int MAX_LITTER_SIZE = 5;
+    private static final int MAX_LITTER_SIZE = 1;
     // A shared random number generator to control breeding.
     private static final Random rand = new Random();
     
@@ -58,6 +58,7 @@ public class Rabbit extends GameObject
     {
 
         if(isAlive()) {
+            breed(updatedField, newRabbits);
             hasEatenYet = false;
             incrementAge();
             incrementHunger();
@@ -126,10 +127,12 @@ public class Rabbit extends GameObject
 
             for(int b = 0; b < births; b++) {
                 Rabbit newRabbit = new Rabbit(false);
-                newRabbits.add(newRabbit);
+//                newRabbits.add(newRabbit);
                 Location loc = updatedField.randomAdjacentLocation(location);
-                newRabbit.setLocation(loc);
-                updatedField.place(newRabbit, loc);
+                System.out.println(loc);
+//
+//                newRabbit.setLocation(loc);
+//                updatedField.place(newRabbit, loc);
             }
         }
     }

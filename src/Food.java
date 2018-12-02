@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class Food extends GameObject
 {
-    private Location location;
+
     private static final double SPAWNING_PROBABILITY = 0.8;
     private static final Random rand = new Random();
     private boolean exists;
@@ -18,7 +18,7 @@ public class Food extends GameObject
     {
         this.location = new Location(row, col);
     }
-    
+
     public void setLocation(Location location)
     {
         this.location = location;

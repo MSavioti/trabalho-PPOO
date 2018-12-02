@@ -27,9 +27,9 @@ public class Simulator extends JFrame implements KeyListener
     // The default depth of the grid.
     private static final int DEFAULT_DEPTH = 50;
     // The probability that a fox will be created in any given grid position.
-    private static final double FOX_CREATION_PROBABILITY = 0.05;
+    private static final double FOX_CREATION_PROBABILITY = 0.07;
     // The probability that a rabbit will be created in any given grid position.
-    private static final double RABBIT_CREATION_PROBABILITY = 0.125;
+    private static final double RABBIT_CREATION_PROBABILITY = 0.08;
     
     private static final double FOOD_CREATION_PROBABILITY = 0.1;
     // The value in seconds that the grid will takes to refresh
@@ -58,7 +58,7 @@ public class Simulator extends JFrame implements KeyListener
     public Simulator()
     {
         //this(DEFAULT_DEPTH, DEFAULT_WIDTH);
-        this(15,15);
+        this(20,25);
     }
     
     @Override
@@ -257,6 +257,7 @@ public class Simulator extends JFrame implements KeyListener
                     Food food = new Food();
                     elements.add(food);
                     food.setLocation(row, col);
+                    //System.out.println("Imprimindo: " + food.getLocation());
                     field.place(food, row, col);
                 }
                
