@@ -76,19 +76,25 @@ public class Fox extends GameObject
 
             // Move towards the source of food if found.
             Location newLocation = findFood(currentField, location, hasEatenYet);
-
             if(newLocation == null) {  // no food found - move randomly
-                newLocation = updatedField.freeAdjacentLocation(location);
+                newLocation = currentField.freeAdjacentLocation(location);
+                if(updatedField.getObjectAt(newLocation) != null)
+                    newLocation = null;
+//                updatedField.percorrer();
+//                currentField.percorrer();
+//                System.out.println("New location da fox: " + newLocation);
             } else //found food
             {
                 hasEatenYet = true;
                 if (canBreed()) {
-                    breed(updatedField, newFoxes);
+                    //breed(updatedField, newFoxes);
                 }
             }
 
             if(newLocation != null) {
                 setLocation(newLocation);
+                System.out.println("Teste: " + updatedField.getObjectAt(newLocation) +
+                        " outro: " + currentField.getObjectAt(newLocation));
                 updatedField.place(this, newLocation);
             }
         }
@@ -100,10 +106,10 @@ public class Fox extends GameObject
     private void incrementAge()
     {
         age++;
-        if(age > MAX_AGE) {
-            alive = false;
-            System.out.println("a raposa da posicao x: " + location.getCol() + " y: " + location.getRow() + " morreu por velhice");
-        }
+//        if(age > MAX_AGE) {
+//            alive = false;
+//            System.out.println("a raposa da posicao x: " + location.getCol() + " y: " + location.getRow() + " morreu por velhice");
+//        }
     }
     
     /**
@@ -112,10 +118,10 @@ public class Fox extends GameObject
     private void incrementHunger()
     {
         foodLevel--;
-        if(foodLevel <= 0) {
-            alive = false;
-            System.out.println("a raposa da posicao x: " + location.getCol() + " y: " + location.getRow() + " morreu por fome");
-        }
+//        if(foodLevel <= 0) {
+//            alive = false;
+//            System.out.println("a raposa da posicao x: " + location.getCol() + " y: " + location.getRow() + " morreu por fome");
+//        }
     }
     
     /**

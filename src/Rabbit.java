@@ -19,7 +19,7 @@ public class Rabbit extends GameObject
     // The likelihood of a rabbit breeding.
     private static final double BREEDING_PROBABILITY = 0.6;
     // The maximum number of births.
-    private static final int MAX_LITTER_SIZE = 1;
+    private static final int MAX_LITTER_SIZE = 3;
     // A shared random number generator to control breeding.
     private static final Random rand = new Random();
     
@@ -80,6 +80,8 @@ public class Rabbit extends GameObject
             }
             if(newLocation == null) {
                 newLocation = updatedField.freeAdjacentLocation(location);
+                if(currentField.getObjectAt(newLocation) != null)
+                    newLocation = null;
                 //System.out.println("estou em : " + location);
                 //currentField.percorrer();
             }
@@ -87,7 +89,7 @@ public class Rabbit extends GameObject
             // Only transfer to the updated field if there was a free location
             if(newLocation != null) {
                 setLocation(newLocation);
-                System.out.println("new location: " + newLocation + "lá tem: " + currentField.getObjectAt(newLocation));
+//                System.out.println("new location: " + newLocation + "lá tem: " + currentField.getObjectAt(newLocation));
                 updatedField.place(this, newLocation);
             }
         }
@@ -127,13 +129,13 @@ public class Rabbit extends GameObject
     {
         if(rand.nextDouble() <= BREEDING_PROBABILITY) {
             int births = rand.nextInt(MAX_LITTER_SIZE) + 1;
-            System.out.println("Terá " + births + " filhos");
+//            System.out.println("Terá " + births + " filhos");
 
             for(int b = 0; b < births; b++) {
                 Rabbit newRabbit = new Rabbit(false);
                 newRabbits.add(newRabbit);
                 Location loc = updatedField.freeAdjacentLocation(location);
-                System.out.println(loc);
+//                System.out.println(loc);
                 newRabbit.setLocation(loc);
                 updatedField.place(newRabbit, loc);
             }

@@ -58,7 +58,7 @@ public class Simulator extends JFrame implements KeyListener
     public Simulator()
     {
         //this(DEFAULT_DEPTH, DEFAULT_WIDTH);
-        this(20,25);
+        this(5,5);
     }
     
     @Override
@@ -179,7 +179,6 @@ public class Simulator extends JFrame implements KeyListener
         // add new born elements to the list of elements
 
         //try to instantiate grass on every location
-        int contadorCriados = 0;
         for(int row = 0; row < field.getDepth(); row++)
         {
             for(int col = 0; col < field.getWidth(); col++) {
@@ -194,7 +193,6 @@ public class Simulator extends JFrame implements KeyListener
                         positionTaken = true;
                     if (!positionTaken) {
                         //System.out.println("\t\tCurrent location:" + currentLocation);
-                        contadorCriados++;
                         Food food = new Food();
                         food.setLocation(currentLocation.getRow(), currentLocation.getCol());
                         newElements.add(food);
@@ -215,7 +213,6 @@ public class Simulator extends JFrame implements KeyListener
 
         // display the new field on screen
         view.showStatus(step, field);
-//        System.out.println(contadorCriados + " comidas criadas");
     }
     /**
      * Reset the simulation to a starting position.
@@ -238,13 +235,15 @@ public class Simulator extends JFrame implements KeyListener
     private void populate(Field field)
     {
         field.clear();
+        int podeCriar = 0;
         for(int row = 0; row < field.getDepth(); row++) {
             for(int col = 0; col < field.getWidth(); col++) {
-                if(rand.nextDouble() <= FOX_CREATION_PROBABILITY) {
+                if(rand.nextDouble() <= FOX_CREATION_PROBABILITY && podeCriar < 4) {
                     Fox fox = new Fox(false);
                     elements.add(fox);
                     fox.setLocation(row, col);
                     field.place(fox, row, col);
+                    podeCriar++;
                 } else if(rand.nextDouble() <= RABBIT_CREATION_PROBABILITY) {
                     Rabbit rabbit = new Rabbit(false);
                     elements.add(rabbit);
