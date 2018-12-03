@@ -14,7 +14,7 @@ public class Fox extends GameObject
     // Characteristics shared by all foxes (static fields).
     
     // The age at which a fox can start to breed.
-    private static final int BREEDING_AGE = 10;
+    private static final int BREEDING_AGE = 2;
     // The age to which a fox can live.
     private static final int MAX_AGE = 150;
     // The likelihood of a fox breeding.
@@ -33,8 +33,6 @@ public class Fox extends GameObject
     private int age;
     // Whether the fox is alive or not.
     private boolean alive;
-    // The fox's position
-    private Location location;
     // The fox's food level, which is increased by eating rabbits.
     private int foodLevel;
 
@@ -68,19 +66,24 @@ public class Fox extends GameObject
         incrementAge();
         incrementHunger();
         if(isAlive()) {
-            // New foxes are born into adjacent locations.
-            int births = breed();
-            for(int b = 0; b < births; b++) {
-                Fox newFox = new Fox(false);
-                newFoxes.add(newFox);
-                Location loc = updatedField.randomAdjacentLocation(location);
-                newFox.setLocation(loc);
-                updatedField.place(newFox, loc);
-            }
+
             // Move towards the source of food if found.
             Location newLocation = findFood(currentField, location);
             if(newLocation == null) {  // no food found - move randomly
                 newLocation = updatedField.freeAdjacentLocation(location);
+            } else { //found food - can breed
+                // New foxes are born into adjacent locations.
+                int births = breed();
+
+                if (births > 0)
+                System.out.println(births + " novas raposas nasceram!");
+                for(int b = 0; b < births; b++) {
+                    Fox newFox = new Fox(false);
+                    newFoxes.add(newFox);
+                    Location loc = updatedField.randomAdjacentLocation(location);
+                    newFox.setLocation(loc);
+                    updatedField.place(newFox, loc);
+                }
             }
             if(newLocation != null) {
                 setLocation(newLocation);
@@ -100,6 +103,7 @@ public class Fox extends GameObject
     {
         age++;
         if(age > MAX_AGE) {
+            System.out.println("Raposa da posição " + getLocation() + " morreu por velhice.");
             alive = false;
         }
     }
@@ -111,6 +115,7 @@ public class Fox extends GameObject
     {
         foodLevel--;
         if(foodLevel <= 0) {
+            System.out.println("Raposa da posição " + getLocation() + " morreu por fome.");
             alive = false;
         }
     }
@@ -133,6 +138,7 @@ public class Fox extends GameObject
                 hasEatenYet = true;
                 Rabbit rabbit = (Rabbit) animal;
                 if(rabbit.isAlive()) {
+                    System.out.println("A raposa da posição " + getLocation() + " comeu o coelho da posição " + rabbit.getLocation());
                     rabbit.setEaten();
                     foodLevel = RABBIT_FOOD_VALUE;
                     return where;

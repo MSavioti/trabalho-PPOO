@@ -14,7 +14,7 @@ public class Rabbit extends GameObject
     // Characteristics shared by all rabbits (static fields).
 
     // The age at which a rabbit can start to breed.
-    private static final int BREEDING_AGE = 5;
+    private static final int BREEDING_AGE = 2;
     // The age to which a rabbit can live.
     private static final int MAX_AGE = 50;
     // The likelihood of a rabbit breeding.
@@ -33,8 +33,6 @@ public class Rabbit extends GameObject
     private int age;
     // Whether the rabbit is alive or not.
     private boolean alive;
-    // The rabbit's position
-    private Location location;
     // The fox's food level, which is increased by eating rabbits.
     private int foodLevel;
 
@@ -53,36 +51,6 @@ public class Rabbit extends GameObject
             age = rand.nextInt(MAX_AGE);
         }
     }
-    
-    /**
-     * This is what the rabbit does most of the time - it runs 
-     * around. Sometimes it will breed or die of old age.
-     */
-    /*
-    public void run(Field updatedField, List newRabbits)
-    {
-        incrementAge();
-        if(alive) {
-            int births = breed();
-            for(int b = 0; b < births; b++) {
-                Rabbit newRabbit = new Rabbit(false);
-                newRabbits.add(newRabbit);
-                Location loc = updatedField.randomAdjacentLocation(location);
-                newRabbit.setLocation(loc);
-                updatedField.place(newRabbit, loc);
-            }
-            Location newLocation = updatedField.freeAdjacentLocation(location);
-            // Only transfer to the updated field if there was a free location
-            if(newLocation != null) {
-                setLocation(newLocation);
-                updatedField.place(this, newLocation);
-            }
-            else {
-                // can neither move nor stay - overcrowding - all locations taken
-                alive = false;
-            }
-        }
-    }*/
 
     public void hunt(Field currentField, Field updatedField, List newRabbits)
     {
@@ -96,12 +64,16 @@ public class Rabbit extends GameObject
             }
             else { //found food
                 int births = breed(); //only breed if have eaten
+                if (births > 0)
+                System.out.println(births + " novos coelhos nasceram!");
+
                 for(int b = 0; b < births; b++) {
                     Rabbit newRabbit = new Rabbit(false);
                     newRabbits.add(newRabbit);
                     Location loc = updatedField.randomAdjacentLocation(location);
                     newRabbit.setLocation(loc);
                     updatedField.place(newRabbit, loc);
+                    System.out.println("Coelho recém-nascido posicionado em " + newRabbit.getLocation());
                 }
             }
 
@@ -124,10 +96,11 @@ public class Rabbit extends GameObject
         while(adjacentLocations.hasNext() && !hasEatenYet) {
             Location where = (Location) adjacentLocations.next();
             Object object = field.getObjectAt(where);
-            if(object instanceof Rabbit) {
+            if(object instanceof Grass) {
                 hasEatenYet = true;
                 Grass grass = (Grass) object;
                 if(grass.exists()) {
+                    System.out.println("O coelho da posição " + getLocation() + " comeu a grama da posição " + grass.getLocation());
                     grass.setEaten();
                     foodLevel = GRASS_FOOD_VALUE;
                     return where;
@@ -145,17 +118,19 @@ public class Rabbit extends GameObject
     {
         age++;
         if(age > MAX_AGE) {
+            System.out.println("Coelho da posição " + location.getRow() + "," + location.getCol() + " morreu por velhice.");
             alive = false;
         }
     }
 
     /**
-     * Make this rabbit more hungry. This could result in the fox's death.
+     * Make this rabbit more hungry. This could result in the rabbit's death.
      */
     private void incrementHunger()
     {
         foodLevel--;
         if(foodLevel <= 0) {
+            System.out.println("Coelho da posição " + location.getRow() + "," + location.getCol() + " morreu por fome.");
             alive = false;
         }
     }

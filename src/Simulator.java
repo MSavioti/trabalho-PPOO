@@ -20,15 +20,15 @@ public class Simulator extends JFrame implements KeyListener
     // The private static final variables represent 
     // configuration information for the simulation.
     // The default width for the grid.
-    private static final int DEFAULT_WIDTH = 20;
+    private static final int DEFAULT_WIDTH = 10;
     // The default depth of the grid.
-    private static final int DEFAULT_DEPTH = 20;
+    private static final int DEFAULT_DEPTH = 10;
     // The probability that a fox will be created in any given grid position.
-    private static final double FOX_CREATION_PROBABILITY = 0.02;
+    private static final double FOX_CREATION_PROBABILITY = 0.075;
     // The probability that a rabbit will be created in any given grid position.
-    private static final double RABBIT_CREATION_PROBABILITY = 0.08;
+    private static final double RABBIT_CREATION_PROBABILITY = 0.15;
     // The probability that a rabbit will be created in any given grid position.
-    private static final double GRASS_CREATION_PROBABILITY = 0.025;
+    private static final double GRASS_CREATION_PROBABILITY = 0.175;
 
     // The list of elements in the field
     private List elements;
@@ -82,6 +82,7 @@ public class Simulator extends JFrame implements KeyListener
 
         // Create a view of the state of each location in the field.
         view = new SimulatorView(depth, width);
+        view.addKeyListener(this);
         view.setColor(Fox.class, Color.blue);
         view.setColor(Rabbit.class, Color.orange);
         view.setColor(Grass.class, Color.green);
@@ -159,11 +160,7 @@ public class Simulator extends JFrame implements KeyListener
         // add new born elements to the list of elements
         elements.addAll(newElements);
         
-        // Swap the field and updatedField at the end of the step.
-        Field temp = field;
-        field = updatedField;
-        updatedField = temp;
-        updatedField.clear();
+
 
         //grass grows at every step, but only after everyone took its action
         for(int row = 0; row < field.getDepth(); row++)
@@ -181,15 +178,20 @@ public class Simulator extends JFrame implements KeyListener
                         positionTaken = true;
 
                     if (!positionTaken) {
-                        Food food = new Food();
-                        food.setLocation(currentLocation.getRow(), currentLocation.getCol());
-                        elements.add(food);
-                        updatedField.place(food, row, col);
+                        Grass grass = new Grass();
+                        grass.setLocation(currentLocation.getRow(), currentLocation.getCol());
+                        elements.add(grass);
+                        updatedField.place(grass, row, col);
                     }
                 }
             }
 //            System.out.println("");
         }
+        // Swap the field and updatedField at the end of the step.
+        Field temp = field;
+        field = updatedField;
+        updatedField = temp;
+        updatedField.clear();
 
         // display the new field on screen
         view.showStatus(step, field);
