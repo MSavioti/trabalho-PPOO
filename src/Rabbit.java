@@ -64,8 +64,8 @@ public class Rabbit extends GameObject
             }
             else { //found food
                 int births = breed(); //only breed if have eaten
-                if (births > 0)
-                System.out.println(births + " novos coelhos nasceram!");
+//                if (births > 0)
+//                System.out.println(births + " novos coelhos nasceram!");
 
                 for(int b = 0; b < births; b++) {
                     Rabbit newRabbit = new Rabbit(false);
@@ -73,7 +73,7 @@ public class Rabbit extends GameObject
                     Location loc = updatedField.randomAdjacentLocation(location);
                     newRabbit.setLocation(loc);
                     updatedField.place(newRabbit, loc);
-                    System.out.println("Coelho recém-nascido posicionado em " + newRabbit.getLocation());
+//                    System.out.println("Coelho recém-nascido posicionado em " + newRabbit.getLocation());
                 }
             }
 
@@ -100,7 +100,7 @@ public class Rabbit extends GameObject
                 hasEatenYet = true;
                 Grass grass = (Grass) object;
                 if(grass.exists()) {
-                    System.out.println("O coelho da posição " + getLocation() + " comeu a grama da posição " + grass.getLocation());
+//                    System.out.println("O coelho da posição " + getLocation() + " comeu a grama da posição " + grass.getLocation());
                     grass.setEaten();
                     foodLevel = GRASS_FOOD_VALUE;
                     return where;
@@ -128,11 +128,11 @@ public class Rabbit extends GameObject
      */
     private void incrementHunger()
     {
-        foodLevel--;
-        if(foodLevel <= 0) {
-            System.out.println("Coelho da posição " + location.getRow() + "," + location.getCol() + " morreu por fome.");
-            alive = false;
-        }
+//        foodLevel--;
+//        if(foodLevel <= 0) {
+//            System.out.println("Coelho da posição " + location.getRow() + "," + location.getCol() + " morreu por fome.");
+//            alive = false;
+//        }
     }
     
     /**

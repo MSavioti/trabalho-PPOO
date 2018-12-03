@@ -20,10 +20,18 @@ public class Grass extends GameObject {
     {
         exists = false;
     }
-    public void refresh(Field currentField, Field updatedField)
+    public void refresh(Field updatedField)
     {
         if (exists)
-            updatedField.place(this, location);
+        {
+            if(updatedField.getObjectAt(location) != null && !(updatedField.getObjectAt(location) instanceof Grass))
+            {
+                setEaten();
+            }else
+            {
+                updatedField.place(this, location);
+            }
+        }
     }
 
     public boolean exists()

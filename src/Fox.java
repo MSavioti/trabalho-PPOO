@@ -73,10 +73,10 @@ public class Fox extends GameObject
                 newLocation = updatedField.freeAdjacentLocation(location);
             } else { //found food - can breed
                 // New foxes are born into adjacent locations.
-                int births = breed();
+                int births = 0;//breed();
 
                 if (births > 0)
-                System.out.println(births + " novas raposas nasceram!");
+//                System.out.println(births + " novas raposas nasceram!");
                 for(int b = 0; b < births; b++) {
                     Fox newFox = new Fox(false);
                     newFoxes.add(newFox);
@@ -102,10 +102,10 @@ public class Fox extends GameObject
     private void incrementAge()
     {
         age++;
-        if(age > MAX_AGE) {
-            System.out.println("Raposa da posição " + getLocation() + " morreu por velhice.");
-            alive = false;
-        }
+//        if(age > MAX_AGE) {
+//            System.out.println("Raposa da posição " + getLocation() + " morreu por velhice.");
+//            alive = false;
+//        }
     }
     
     /**
@@ -113,11 +113,11 @@ public class Fox extends GameObject
      */
     private void incrementHunger()
     {
-        foodLevel--;
-        if(foodLevel <= 0) {
-            System.out.println("Raposa da posição " + getLocation() + " morreu por fome.");
-            alive = false;
-        }
+//        foodLevel--;
+//        if(foodLevel <= 0) {
+//            System.out.println("Raposa da posição " + getLocation() + " morreu por fome.");
+//            alive = false;
+//        }
     }
     
     /**
@@ -138,7 +138,7 @@ public class Fox extends GameObject
                 hasEatenYet = true;
                 Rabbit rabbit = (Rabbit) animal;
                 if(rabbit.isAlive()) {
-                    System.out.println("A raposa da posição " + getLocation() + " comeu o coelho da posição " + rabbit.getLocation());
+//                    System.out.println("A raposa da posição " + getLocation() + " comeu o coelho da posição " + rabbit.getLocation());
                     rabbit.setEaten();
                     foodLevel = RABBIT_FOOD_VALUE;
                     return where;

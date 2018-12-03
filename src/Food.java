@@ -5,7 +5,7 @@ import java.util.Random;
 public class Food extends GameObject
 {
 
-    private static final double SPAWNING_PROBABILITY = 0.8;
+    private static final double GRASS_CREATION_PROBABILITY = 0.175;
     private static final Random rand = new Random();
     private boolean exists;
     
@@ -28,10 +28,16 @@ public class Food extends GameObject
     {
         exists = false;
     }
-    public void refresh(Field currentField, Field updatedField)
+    public void refresh(Field updatedField)
     {
         if (exists)
+        {
             updatedField.place(this, location);
+            if(rand.nextDouble() <= GRASS_CREATION_PROBABILITY)
+            {
+                
+            }
+        }
     }
     
     public boolean exists()

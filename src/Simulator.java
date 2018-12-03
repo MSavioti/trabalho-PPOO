@@ -20,11 +20,11 @@ public class Simulator extends JFrame implements KeyListener
     // The private static final variables represent 
     // configuration information for the simulation.
     // The default width for the grid.
-    private static final int DEFAULT_WIDTH = 10;
+    private static final int DEFAULT_WIDTH = 20;
     // The default depth of the grid.
-    private static final int DEFAULT_DEPTH = 10;
+    private static final int DEFAULT_DEPTH = 20;
     // The probability that a fox will be created in any given grid position.
-    private static final double FOX_CREATION_PROBABILITY = 0.075;
+    private static final double FOX_CREATION_PROBABILITY = 0.055;
     // The probability that a rabbit will be created in any given grid position.
     private static final double RABBIT_CREATION_PROBABILITY = 0.15;
     // The probability that a rabbit will be created in any given grid position.
@@ -126,7 +126,16 @@ public class Simulator extends JFrame implements KeyListener
         // let all elements act
         for(Iterator iter = elements.iterator(); iter.hasNext(); ) {
             Object object = iter.next();
-            if(object instanceof Rabbit) {
+            if (object instanceof Grass)
+            {
+                Grass grass = (Grass) object;
+                if (grass.exists()) {
+                    grass.refresh(updatedField);
+                }
+                else {
+                    iter.remove();
+                }
+            }else if(object instanceof Rabbit) {
                 Rabbit rabbit = (Rabbit)object;
                 if(rabbit.isAlive()) {
                     rabbit.hunt(field, updatedField, newElements);
@@ -144,18 +153,6 @@ public class Simulator extends JFrame implements KeyListener
                     iter.remove();   // remove dead foxes from collection
                 }
             }
-            else if (object instanceof Grass) {
-                Grass grass = (Grass) object;
-                if (grass.exists()) {
-                    grass.refresh(field, updatedField);
-                }
-                else {
-                    iter.remove();
-                }
-            }
-            else {
-                System.out.println("found unknown animal");
-            }
         }
         // add new born elements to the list of elements
         elements.addAll(newElements);
@@ -163,30 +160,29 @@ public class Simulator extends JFrame implements KeyListener
 
 
         //grass grows at every step, but only after everyone took its action
-        for(int row = 0; row < field.getDepth(); row++)
-        {
-            for(int col = 0; col < field.getWidth(); col++) {
-//                System.out.print(updatedField.getObjectAt(row,col) + " ");
-                if(rand.nextDouble() <= GRASS_CREATION_PROBABILITY) {
-                    Location currentLocation = new Location(row, col);
-                    GameObject gameObj = (GameObject) updatedField.getObjectAt(row, col);
-                    GameObject gameObj2 = (GameObject) field.getObjectAt(row, col);
-                    //updatedField.percorrer();
-                    boolean positionTaken = false;
-
-                    if(gameObj != null || gameObj2 != null)
-                        positionTaken = true;
-
-                    if (!positionTaken) {
-                        Grass grass = new Grass();
-                        grass.setLocation(currentLocation.getRow(), currentLocation.getCol());
-                        elements.add(grass);
-                        updatedField.place(grass, row, col);
-                    }
-                }
-            }
+//        for(int row = 0; row < field.getDepth(); row++)
+//        {
+//            for(int col = 0; col < field.getWidth(); col++) {
+////                System.out.print(updatedField.getObjectAt(row,col) + " ");
+//                if(rand.nextDouble() <= GRASS_CREATION_PROBABILITY) {
+//                    Location currentLocation = new Location(row, col);
+//                    GameObject gameObj = (GameObject) updatedField.getObjectAt(row, col);
+//                    //updatedField.percorrer();
+//                    boolean positionTaken = false;
+//
+//                    if(gameObj != null)
+//                        positionTaken = true;
+//
+//                    if (!positionTaken) {
+//                        Grass grass = new Grass();
+//                        grass.setLocation(currentLocation.getRow(), currentLocation.getCol());
+//                        elements.add(grass);
+//                        updatedField.place(grass, currentLocation);
+//                    }
+//                }
+//            }
 //            System.out.println("");
-        }
+//        }
         // Swap the field and updatedField at the end of the step.
         Field temp = field;
         field = updatedField;
