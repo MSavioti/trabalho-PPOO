@@ -16,14 +16,14 @@ public class Rabbit extends GameObject
     // The age at which a rabbit can start to breed.
     private static final int BREEDING_AGE = 2;
     // The age to which a rabbit can live.
-    private static final int MAX_AGE = 50;
+    private static final int MAX_AGE = 15;
     // The likelihood of a rabbit breeding.
-    private static final double BREEDING_PROBABILITY = 0.15;
+    private static final double BREEDING_PROBABILITY = 0.21;
     // The maximum number of births.
-    private static final int MAX_LITTER_SIZE = 3;
+    private static final int MAX_LITTER_SIZE = 2;
     // The food value of a single rabbit. In effect, this is the
     // number of steps a fox can go before it has to eat again.
-    private static final int GRASS_FOOD_VALUE = 4;
+    private static final int GRASS_FOOD_VALUE = 15;
     // A shared random number generator to control breeding.
     private static final Random rand = new Random();
     
@@ -55,7 +55,6 @@ public class Rabbit extends GameObject
     public void hunt(Field currentField, Field updatedField, List newRabbits)
     {
         incrementAge();
-        incrementHunger();
         if(isAlive()) {
             // Move towards the source of food if found.
             Location newLocation = findFood(currentField, location);
@@ -64,15 +63,19 @@ public class Rabbit extends GameObject
             }
             else { //found food
                 int births = breed(); //only breed if have eaten
-//                if (births > 0)
-//                System.out.println(births + " novos coelhos nasceram!");
+                if (births > 0)
+                //System.out.println(births + " novos coelhos nasceram!");
 
                 for(int b = 0; b < births; b++) {
                     Rabbit newRabbit = new Rabbit(false);
                     newRabbits.add(newRabbit);
-                    Location loc = updatedField.randomAdjacentLocation(location);
-                    newRabbit.setLocation(loc);
-                    updatedField.place(newRabbit, loc);
+                    Location loc = updatedField.freeAdjacentLocation(location);
+
+                    if (loc != null) {
+
+                        newRabbit.setLocation(loc);
+                        updatedField.place(newRabbit, loc);
+                    }
 //                    System.out.println("Coelho recém-nascido posicionado em " + newRabbit.getLocation());
                 }
             }
@@ -85,6 +88,7 @@ public class Rabbit extends GameObject
                 // can neither move nor stay - overcrowding - all locations taken
                 alive = false;
             }
+            incrementHunger();
         }
     }
 
@@ -93,7 +97,7 @@ public class Rabbit extends GameObject
         Iterator adjacentLocations = field.adjacentLocations(location);
         boolean hasEatenYet = false;
 
-        while(adjacentLocations.hasNext() && !hasEatenYet) {
+        while(adjacentLocations != null && adjacentLocations.hasNext() && !hasEatenYet) {
             Location where = (Location) adjacentLocations.next();
             Object object = field.getObjectAt(where);
             if(object instanceof Grass) {
@@ -128,11 +132,11 @@ public class Rabbit extends GameObject
      */
     private void incrementHunger()
     {
-//        foodLevel--;
-//        if(foodLevel <= 0) {
-//            System.out.println("Coelho da posição " + location.getRow() + "," + location.getCol() + " morreu por fome.");
-//            alive = false;
-//        }
+        foodLevel--;
+        if(foodLevel <= 0) {
+            System.out.println("Coelho da posição " + location.getRow() + "," + location.getCol() + " morreu por fome.");
+            alive = false;
+        }
     }
     
     /**

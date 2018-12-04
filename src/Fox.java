@@ -14,16 +14,16 @@ public class Fox extends GameObject
     // Characteristics shared by all foxes (static fields).
     
     // The age at which a fox can start to breed.
-    private static final int BREEDING_AGE = 2;
+    private static final int BREEDING_AGE = 4;
     // The age to which a fox can live.
-    private static final int MAX_AGE = 150;
+    private static final int MAX_AGE = 40;
     // The likelihood of a fox breeding.
-    private static final double BREEDING_PROBABILITY = 0.09;
+    private static final double BREEDING_PROBABILITY = 0.04;
     // The maximum number of births.
-    private static final int MAX_LITTER_SIZE = 3;
+    private static final int MAX_LITTER_SIZE = 2;
     // The food value of a single rabbit. In effect, this is the
     // number of steps a fox can go before it has to eat again.
-    private static final int RABBIT_FOOD_VALUE = 4;
+    private static final int RABBIT_FOOD_VALUE = 20;
     // A shared random number generator to control breeding.
     private static final Random rand = new Random();
     
@@ -64,7 +64,6 @@ public class Fox extends GameObject
     public void hunt(Field currentField, Field updatedField, List newFoxes)
     {
         incrementAge();
-        incrementHunger();
         if(isAlive()) {
 
             // Move towards the source of food if found.
@@ -73,7 +72,7 @@ public class Fox extends GameObject
                 newLocation = updatedField.freeAdjacentLocation(location);
             } else { //found food - can breed
                 // New foxes are born into adjacent locations.
-                int births = 0;//breed();
+                int births = breed();
 
                 if (births > 0)
 //                System.out.println(births + " novas raposas nasceram!");
@@ -95,6 +94,7 @@ public class Fox extends GameObject
                 // can neither move nor stay - overcrowding - all locations taken
                 alive = false;
             }
+            incrementHunger();
         }
     }
     
@@ -104,10 +104,10 @@ public class Fox extends GameObject
     private void incrementAge()
     {
         age++;
-//        if(age > MAX_AGE) {
-//            System.out.println("Raposa da posição " + getLocation() + " morreu por velhice.");
-//            alive = false;
-//        }
+        if(age > MAX_AGE) {
+            System.out.println("Raposa da posição " + getLocation() + " morreu por velhice.");
+            alive = false;
+        }
     }
     
     /**
@@ -115,11 +115,11 @@ public class Fox extends GameObject
      */
     private void incrementHunger()
     {
-//        foodLevel--;
-//        if(foodLevel <= 0) {
-//            System.out.println("Raposa da posição " + getLocation() + " morreu por fome.");
-//            alive = false;
-//        }
+        foodLevel--;
+        if(foodLevel <= 0) {
+            System.out.println("Raposa da posição " + getLocation() + " morreu por fome.");
+            alive = false;
+        }
     }
     
     /**
@@ -140,7 +140,7 @@ public class Fox extends GameObject
                 hasEatenYet = true;
                 Rabbit rabbit = (Rabbit) animal;
                 if(rabbit.isAlive()) {
-//                    System.out.println("A raposa da posição " + getLocation() + " comeu o coelho da posição " + rabbit.getLocation());
+//                  System.out.println("A raposa da posição " + getLocation() + " comeu o coelho da posição " + rabbit.getLocation());
                     rabbit.setEaten();
                     foodLevel = RABBIT_FOOD_VALUE;
                     return where;
@@ -157,11 +157,10 @@ public class Fox extends GameObject
      */
     private int breed()
     {
-        int births = 0;
         if(canBreed() && rand.nextDouble() <= BREEDING_PROBABILITY) {
-            births = rand.nextInt(MAX_LITTER_SIZE) + 1;
+            return rand.nextInt(MAX_LITTER_SIZE) + 1;
         }
-        return births;
+        return 0;
     }
 
     /**

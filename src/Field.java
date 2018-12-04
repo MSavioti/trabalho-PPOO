@@ -130,20 +130,20 @@ public class Field
      */
     public Location freeAdjacentLocation(Location location)
     {
-        Iterator adjacent = adjacentLocations(location);
-        while(adjacent.hasNext()) {
-            Location next = (Location) adjacent.next();
-            if(field[next.getRow()][next.getCol()] == null) {
-                return next;
+        if (location != null) {
+            Iterator adjacent = adjacentLocations(location);
+            while(adjacent.hasNext()) {
+                Location next = (Location) adjacent.next();
+                if(field[next.getRow()][next.getCol()] == null) {
+                    return next;
+                }
+            }
+            // check whether current location is free
+            if(field[location.getRow()][location.getCol()] == null) {
+                return location;
             }
         }
-        // check whether current location is free
-        if(field[location.getRow()][location.getCol()] == null) {
-            return location;
-        } 
-        else {
-            return null;
-        }
+        return null;
     }
 
     /**
@@ -155,23 +155,26 @@ public class Field
      */
     public Iterator adjacentLocations(Location location)
     {
-        int row = location.getRow();
-        int col = location.getCol();
-        LinkedList locations = new LinkedList();
-        for(int roffset = -1; roffset <= 1; roffset++) {
-            int nextRow = row + roffset;
-            if(nextRow >= 0 && nextRow < depth) {
-                for(int coffset = -1; coffset <= 1; coffset++) {
-                    int nextCol = col + coffset;
-                    // Exclude invalid locations and the original location.
-                    if(nextCol >= 0 && nextCol < width && (roffset != 0 || coffset != 0)) {
-                        locations.add(new Location(nextRow, nextCol));
+        if (location != null) {
+            int row = location.getRow();
+            int col = location.getCol();
+            LinkedList locations = new LinkedList();
+            for(int roffset = -1; roffset <= 1; roffset++) {
+                int nextRow = row + roffset;
+                if(nextRow >= 0 && nextRow < depth) {
+                    for(int coffset = -1; coffset <= 1; coffset++) {
+                        int nextCol = col + coffset;
+                        // Exclude invalid locations and the original location.
+                        if(nextCol >= 0 && nextCol < width && (roffset != 0 || coffset != 0)) {
+                            locations.add(new Location(nextRow, nextCol));
+                        }
                     }
                 }
             }
+            Collections.shuffle(locations,rand);
+            return locations.iterator();
         }
-        Collections.shuffle(locations,rand);
-        return locations.iterator();
+        return null;
     }
 
     /**

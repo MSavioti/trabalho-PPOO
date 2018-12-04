@@ -20,15 +20,15 @@ public class Simulator extends JFrame implements KeyListener
     // The private static final variables represent 
     // configuration information for the simulation.
     // The default width for the grid.
-    private static final int DEFAULT_WIDTH = 20;
+    private static final int DEFAULT_WIDTH = 15;
     // The default depth of the grid.
-    private static final int DEFAULT_DEPTH = 20;
+    private static final int DEFAULT_DEPTH = 15;
     // The probability that a fox will be created in any given grid position.
-    private static final double FOX_CREATION_PROBABILITY = 0.055;
+    private static final double FOX_CREATION_PROBABILITY = 0.04;
     // The probability that a rabbit will be created in any given grid position.
     private static final double RABBIT_CREATION_PROBABILITY = 0.15;
     // The probability that a rabbit will be created in any given grid position.
-    private static final double GRASS_CREATION_PROBABILITY = 0.175;
+    private static final double GRASS_CREATION_PROBABILITY = 0.25;
 
     // The list of elements in the field
     private List elements;
@@ -131,10 +131,20 @@ public class Simulator extends JFrame implements KeyListener
                     grass.refresh(field, updatedField, newElements);
                 }
                 else {
+                    Grass newGrass = new Grass();
+                    Location newGrassLocation = updatedField.freeAdjacentLocation(grass.getLocation());
+
+                    if (newGrassLocation != null) {
+                        newGrass.setLocation(newGrassLocation);
+                        newElements.add(newGrass);
+                        updatedField.place(newGrass, newGrassLocation);
+                    }
                     iter.remove();
                 }
             }
         }
+        view.showStatus(step, updatedField);
+
         // let all elements act
         for(Iterator iter = elements.iterator(); iter.hasNext(); ) {
             Object object = iter.next();
