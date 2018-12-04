@@ -86,6 +86,8 @@ public class Fox extends GameObject
                 }
             }
             if(newLocation != null) {
+//                System.out.println("When fox is moving");
+//                updatedField.percorrer();
                 setLocation(newLocation);
                 updatedField.place(this, newLocation);
             }

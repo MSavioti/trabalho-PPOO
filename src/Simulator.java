@@ -122,20 +122,23 @@ public class Simulator extends JFrame implements KeyListener
     {
         step++;
         newElements.clear();
-        
-        // let all elements act
         for(Iterator iter = elements.iterator(); iter.hasNext(); ) {
             Object object = iter.next();
             if (object instanceof Grass)
             {
                 Grass grass = (Grass) object;
                 if (grass.exists()) {
-                    grass.refresh(updatedField);
+                    grass.refresh(field, updatedField, newElements);
                 }
                 else {
                     iter.remove();
                 }
-            }else if(object instanceof Rabbit) {
+            }
+        }
+        // let all elements act
+        for(Iterator iter = elements.iterator(); iter.hasNext(); ) {
+            Object object = iter.next();
+            if(object instanceof Rabbit) {
                 Rabbit rabbit = (Rabbit)object;
                 if(rabbit.isAlive()) {
                     rabbit.hunt(field, updatedField, newElements);
@@ -154,6 +157,10 @@ public class Simulator extends JFrame implements KeyListener
                 }
             }
         }
+//        System.out.println("Current:");
+//        field.percorrer();
+//        System.out.println("\nUpdated");
+//        updatedField.percorrer();
         // add new born elements to the list of elements
         elements.addAll(newElements);
         

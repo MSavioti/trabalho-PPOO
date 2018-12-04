@@ -189,4 +189,16 @@ public class Field
     {
         return width;
     }
+
+    public void percorrer()
+    {
+        for (int i = 0; i < depth; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                System.out.print(field[i][j] + " ");
+            }
+            System.out.println("");
+        }
+    }
 }
