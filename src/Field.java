@@ -1,7 +1,6 @@
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Random;
 
 /**
  * Represent a rectangular grid of field positions.
@@ -12,8 +11,6 @@ import java.util.Random;
  */
 public class Field
 {
-    private static final Random rand = new Random();
-    
     // The depth and width of the field.
     private int depth, width;
     // Storage for the animals.
@@ -103,8 +100,8 @@ public class Field
         int row = location.getRow();
         int col = location.getCol();
         // Generate an offset of -1, 0, or +1 for both the current row and col.
-        int nextRow = row + rand.nextInt(3) - 1;
-        int nextCol = col + rand.nextInt(3) - 1;
+        int nextRow = row + Simulator.rand.nextInt(3) - 1;
+        int nextCol = col + Simulator.rand.nextInt(3) - 1;
         // Check in case the new location is outside the bounds.
         if(nextRow < 0 || nextRow >= depth || nextCol < 0 || nextCol >= width) {
             return location;
@@ -146,6 +143,7 @@ public class Field
         return null;
     }
 
+
     /**
      * Generate an iterator over a shuffled list of locations adjacent
      * to the given one. The list will not include the location itself.
@@ -171,7 +169,7 @@ public class Field
                     }
                 }
             }
-            Collections.shuffle(locations,rand);
+            Collections.shuffle(locations,Simulator.rand);
             return locations.iterator();
         }
         return null;
@@ -184,24 +182,12 @@ public class Field
     {
         return depth;
     }
-    
+
     /**
      * @return The width of the field.
      */
     public int getWidth()
     {
         return width;
-    }
-
-    public void percorrer()
-    {
-        for (int i = 0; i < depth; i++)
-        {
-            for (int j = 0; j < width; j++)
-            {
-                System.out.print(field[i][j] + " ");
-            }
-            System.out.println("");
-        }
     }
 }

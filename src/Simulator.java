@@ -15,20 +15,39 @@ import java.awt.Color;
  * @author David J. Barnes and Michael Kolling
  * @version 2002-04-09
  */
-public class Simulator extends JFrame implements KeyListener
+public class Simulator implements KeyListener
 {
     // The private static final variables represent 
     // configuration information for the simulation.
     // The default width for the grid.
-    private static final int DEFAULT_WIDTH = 15;
+    private static final int DEFAULT_WIDTH = 10;
     // The default depth of the grid.
-    private static final int DEFAULT_DEPTH = 15;
+    private static final int DEFAULT_DEPTH = 10;
     // The probability that a fox will be created in any given grid position.
-    private static final double FOX_CREATION_PROBABILITY = 0.04;
+    private static final double FOX_CREATION_PROBABILITY = 0.05;
     // The probability that a rabbit will be created in any given grid position.
     private static final double RABBIT_CREATION_PROBABILITY = 0.15;
     // The probability that a rabbit will be created in any given grid position.
-    private static final double GRASS_CREATION_PROBABILITY = 0.25;
+    public static final double GRASS_CREATION_PROBABILITY = 0.25;
+    // The max age that a rabbit can reach
+    public static final int RABBIT_MAX_AGE = 15;
+    // The max age that a fox can reach
+    public static final int FOX_MAX_AGE = 25;
+    // The food value that an animal gains when eating a rabbit
+    public static final int RABBIT_FOOD_VALUE = 20;
+    // The food value that an animal gains when eating a grass
+    public static final int GRASS_FOOD_VALUE = 15;
+    // The rabbit bredding probability
+    public static final double RABBIT_BREEDING_PROBABILITY = 0.21;
+    // The fox bredding probability
+    public static final double FOX_BREEDING_PROBABILITY = 0.08;
+
+    public static final int RABBIT_MAX_LITTER_SIZE = 2;
+    public static final int FOX_MAX_LITTER_SIZE = 2;
+    // The age that rabbit can breed
+    public static final int RABBIT_BREEDING_AGE = 2;
+    // The age that fox can breed
+    public static final int FOX_BREEDING_AGE = 4;
 
     // The list of elements in the field
     private List elements;
@@ -43,7 +62,7 @@ public class Simulator extends JFrame implements KeyListener
     // A graphical view of the simulation.
     private SimulatorView view;
 
-    private Random rand;
+    public static Random rand = new Random();
 
     @Override
     public void keyPressed(KeyEvent e)
@@ -86,33 +105,21 @@ public class Simulator extends JFrame implements KeyListener
         view.setColor(Fox.class, Color.blue);
         view.setColor(Rabbit.class, Color.orange);
         view.setColor(Grass.class, Color.green);
-
-        rand = new Random();
-        
         // Setup a valid starting point.
-        reset();
+        step = 0;
+
+        //reset();
     }
-    
     /**
-     * Run the simulation from its current state for a reasonably long period,
-     * e.g. 500 steps.
+     * Starts the simulator
      */
-    public void runLongSimulation()
-    {
-        simulate(500);
+    public void runSimulator() {
+        populate(field);
+
+        // Show the starting state in the view.
+        view.showStatus(step, field);
     }
-    
-    /**
-     * Run the simulation from its current state for the given number of steps.
-     * Stop before the given number of steps if it ceases to be viable.
-     */
-    public void simulate(int numSteps)
-    {
-        for(int step = 1; step <= numSteps && view.isViable(field); step++) {
-            simulateOneStep();
-        }
-    }
-    
+
     /**
      * Run the simulation from its current state for a single step.
      * Iterate over the whole field updating the state of each
@@ -127,8 +134,8 @@ public class Simulator extends JFrame implements KeyListener
             if (object instanceof Grass)
             {
                 Grass grass = (Grass) object;
-                if (grass.exists()) {
-                    grass.refresh(field, updatedField, newElements);
+                if (grass.isAlive()) {
+                    grass.refresh(field, updatedField);
                 }
                 else {
                     Grass newGrass = new Grass();
@@ -167,39 +174,8 @@ public class Simulator extends JFrame implements KeyListener
                 }
             }
         }
-//        System.out.println("Current:");
-//        field.percorrer();
-//        System.out.println("\nUpdated");
-//        updatedField.percorrer();
-        // add new born elements to the list of elements
         elements.addAll(newElements);
-        
 
-
-        //grass grows at every step, but only after everyone took its action
-//        for(int row = 0; row < field.getDepth(); row++)
-//        {
-//            for(int col = 0; col < field.getWidth(); col++) {
-////                System.out.print(updatedField.getObjectAt(row,col) + " ");
-//                if(rand.nextDouble() <= GRASS_CREATION_PROBABILITY) {
-//                    Location currentLocation = new Location(row, col);
-//                    GameObject gameObj = (GameObject) updatedField.getObjectAt(row, col);
-//                    //updatedField.percorrer();
-//                    boolean positionTaken = false;
-//
-//                    if(gameObj != null)
-//                        positionTaken = true;
-//
-//                    if (!positionTaken) {
-//                        Grass grass = new Grass();
-//                        grass.setLocation(currentLocation.getRow(), currentLocation.getCol());
-//                        elements.add(grass);
-//                        updatedField.place(grass, currentLocation);
-//                    }
-//                }
-//            }
-//            System.out.println("");
-//        }
         // Swap the field and updatedField at the end of the step.
         Field temp = field;
         field = updatedField;
@@ -227,6 +203,7 @@ public class Simulator extends JFrame implements KeyListener
     
     /**
      * Populate the field with foxes and rabbits.
+     * @param field the field that will be populated
      */
     private void populate(Field field)
     {
@@ -234,13 +211,13 @@ public class Simulator extends JFrame implements KeyListener
         for(int row = 0; row < field.getDepth(); row++) {
             for(int col = 0; col < field.getWidth(); col++) {
                 if(rand.nextDouble() <= FOX_CREATION_PROBABILITY) {
-                    Fox fox = new Fox(false);
+                    Fox fox = new Fox(FOX_MAX_AGE, RABBIT_FOOD_VALUE, FOX_BREEDING_AGE, FOX_BREEDING_PROBABILITY, FOX_MAX_LITTER_SIZE);
                     elements.add(fox);
                     fox.setLocation(row, col);
                     field.place(fox, row, col);
                 }
                 else if(rand.nextDouble() <= RABBIT_CREATION_PROBABILITY) {
-                    Rabbit rabbit = new Rabbit(false);
+                    Rabbit rabbit = new Rabbit(RABBIT_MAX_AGE, GRASS_FOOD_VALUE, RABBIT_BREEDING_AGE, RABBIT_BREEDING_PROBABILITY, RABBIT_MAX_LITTER_SIZE);
                     elements.add(rabbit);
                     rabbit.setLocation(row, col);
                     field.place(rabbit, row, col);

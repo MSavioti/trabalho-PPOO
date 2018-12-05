@@ -25,7 +25,7 @@ public class Counter
         this.name = name;
         count = 0;
     }
-    
+
     /**
      * @return The short description of this type.
      */
@@ -49,7 +49,7 @@ public class Counter
     {
         count++;
     }
-    
+
     /**
      * Reset the current count to zero.
      */
